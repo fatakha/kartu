@@ -1,4 +1,4 @@
-const KEYS = ["no-urut", "kelas", "nama", "pengampu", "penguji", "keterangan"];
+const KEYS = ["kelas", "keterangan", "nama", "no-urut", "penguji", "pengampu"];
 const PLACEHOLDERS = ["{{NO}}", "{{NO_URUT}}", "{{KELAS}}", "{{NAMA}}", "{{PENGAMPU}}", "{{PENGUJI}}", "{{KET}}"];
 
 let kunciMapping = {
@@ -6,19 +6,19 @@ let kunciMapping = {
   "{{NAMA}}": "Nama Santri", "{{PENGAMPU}}": "Pengampu", "{{PENGUJI}}": "Penguji", "{{KET}}": "Keterangan"
 };
 
-// Koordinat default awal dalam satuan persen (%) agar responsif saat mode edit
+// Koordinat Presisi Berdasarkan Letak Elemen Pada Picture1.jpg
 let posisiTeks = {
-  "no-urut":    { top: 12, left: 10, size: 12, width: 40, align: 'left' },
-  "kelas":      { top: 12, left: 60, size: 12, width: 30, align: 'right' },
-  "nama":       { top: 40, left: 5,  size: 16, width: 90, align: 'center' },
-  "pengampu":   { top: 60, left: 12, size: 12, width: 75, align: 'left' },
-  "penguji":    { top: 68, left: 12, size: 12, width: 75, align: 'left' },
-  "keterangan": { top: 78, left: 12, size: 12, width: 75, align: 'left' }
+  "kelas":      { top: 5,  left: 3,  size: 11, width: 25, align: 'left' },
+  "keterangan": { top: 5,  left: 72, size: 11, width: 25, align: 'right' },
+  "nama":       { top: 58, left: 5,  size: 24, width: 90, align: 'center' }, // Nama Santri Besar di Tengah
+  "no-urut":    { top: 81, left: 23, size: 12, width: 10, align: 'left' },   // Pas di kanan tulisan No. Urut :
+  "penguji":    { top: 81, left: 47, size: 12, width: 20, align: 'left' },   // Pas di kanan tulisan Nama Penguji :
+  "pengampu":   { top: 81, left: 74, size: 12, width: 20, align: 'left' }    // Pas di kanan tulisan Nama Pengampu :
 };
 
 let csvRecords = [];
 let csvHeaders = [];
-let appMode = "preview"; // Pilihan mode: "preview" (1 kartu) atau "print" (6 kartu)
+let appMode = "preview";
 
 async function inisialisasiAplikasi() {
   try {
@@ -67,7 +67,7 @@ function buatUIPosisi() {
       <div class="slider-group">
         <label>Atas (Y): <input type="range" min="0" max="100" value="${posisiTeks[k].top}" oninput="ubahPosisi('${k}', 'top', this.value)"></label>
         <label>Kiri (X): <input type="range" min="0" max="100" value="${posisiTeks[k].left}" oninput="ubahPosisi('${k}', 'left', this.value)"></label>
-        <label>Ukuran Huruf: <input type="range" min="8" max="30" value="${posisiTeks[k].size}" oninput="ubahPosisi('${k}', 'size', this.value)"></label>
+        <label>Ukuran Huruf: <input type="range" min="8" max="40" value="${posisiTeks[k].size}" oninput="ubahPosisi('${k}', 'size', this.value)"></label>
       </div>
     `;
     container.appendChild(section);
@@ -106,13 +106,11 @@ function updateTampilan() {
   if (csvRecords.length === 0) return;
 
   if (appMode === "preview") {
-    // Mode Edit: Hanya ambil record pertama sebagai contoh cetakan tunggal besar
     let html = '<div class="preview-container-box">';
     html += buatHtmlKartu(csvRecords[0], "previewmaster");
     html += '</div>';
     display.innerHTML = html;
   } else {
-    // Mode Cetak: Next record otomatis dipecah 6 kartu per lembar kertas A4
     let html = '<div class="page">';
     let count = 0;
     const keyNama = kunciMapping["{{NAMA}}"];
