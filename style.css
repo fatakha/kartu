@@ -1,168 +1,134 @@
-const KEYS = ["kelas", "keterangan", "nama", "no-urut", "penguji", "pengampu"];
-const PLACEHOLDERS = ["{{NO}}", "{{NO_URUT}}", "{{KELAS}}", "{{NAMA}}", "{{PENGAMPU}}", "{{PENGUJI}}", "{{KET}}"];
+/* ==================== CONFIG CETAK STANDAR INTERNASIONAL A4 ==================== */
+@page {
+  size: A4;
+  margin: 5mm 5mm; /* Memperkecil margin luar agar kertas lebih luas */
+}
 
-let kunciMapping = {
-  "{{NO}}": "No", "{{NO_URUT}}": "No Urut", "{{KELAS}}": "Kelas",
-  "{{NAMA}}": "Nama Santri", "{{PENGAMPU}}": "Pengampu", "{{PENGUJI}}": "Penguji", "{{KET}}": "Keterangan"
-};
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background-color: #f8fafc;
+  color: #1e293b;
+}
 
-// Ukuran huruf diubah ke % agar proporsional dan tidak bertabrakan lagi
-let posisiTeks = {
-  "kelas":      { top: 5,  left: 3,  size: 100, width: 25, align: 'left' },
-  "keterangan": { top: 5,  left: 72, size: 100, width: 25, align: 'right' },
-  "nama":       { top: 56, left: 5,  size: 160, width: 90, align: 'center' }, // Mengecil agar pas di tengah
-  "no-urut":    { top: 81, left: 22, size: 100, width: 10, align: 'left' },
-  "penguji":    { top: 81, left: 47, size: 100, width: 20, align: 'left' },
-  "pengampu":   { top: 81, left: 74, size: 100, width: 20, align: 'left' }
-};
+/* ==================== UI PANEL CONTROL EDITING (HILANG SAAT PRINT) ==================== */
+#control-panel {
+  background-color: #ffffff;
+  border-bottom: 3px solid #3b82f6;
+  padding: 20px;
+  max-width: 750px;
+  margin: 15px auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+#control-panel h2 { margin: 0 0 15px 0; font-size: 18px; color: #1e3a8a; }
 
-let csvRecords = [];
-let csvHeaders = [];
-let appMode = "preview";
+.tabs { display: flex; gap: 5px; margin-bottom: 15px; border-bottom: 2px solid #e2e8f0; padding-bottom: 5px; }
+.tab-btn { background: none; border: none; padding: 8px 16px; font-weight: bold; color: #64748b; cursor: pointer; }
+.tab-btn.active { color: #2563eb; border-bottom: 3px solid #2563eb; }
 
-async function inisialisasiAplikasi() {
-  try {
-    const response = await fetch('data.csv');
-    const dataText = await response.text();
-    const lines = dataText.split('\n').map(l => l.trim()).filter(l => l !== "");
-    
-    const pemisahHeader = lines[0].includes(';') ? ';' : ',';
-    csvHeaders = lines[0].split(pemisahHeader).map(h => h.trim());
-    csvRecords = csvToArray(lines, csvHeaders);
-    
-    buatUIMapping();
-    buatUIPosisi();
-    updateTampilan();
-  } catch (error) {
-    document.getElementById('main-display').innerHTML = "<p style='color:red; padding:20px;'>Gagal memuat data.csv.</p>";
+.tab-content { background: #f8fafc; padding: 12px; border-radius: 6px; margin-bottom: 15px; }
+.form-row { display: flex; justify-content: space-between; margin-bottom: 8px; align-items: center; }
+.form-row label { font-size: 12px; font-weight: bold; }
+.form-row select { width: 60%; padding: 5px; border-radius: 4px; border: 1px solid #cbd5e1; }
+
+.pos-section { background: white; border: 1px solid #e2e8f0; border-radius: 5px; padding: 10px; margin-bottom: 10px; }
+.pos-section h4 { margin: 0 0 8px 0; font-size: 11px; color: #475569; letter-spacing: 0.5px; }
+.slider-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.slider-group label { font-size: 11px; display: flex; flex-direction: column; gap: 3px; }
+
+.panel-actions { display: flex; gap: 10px; }
+.panel-actions button { flex: 1; padding: 12px; font-weight: bold; border-radius: 6px; cursor: pointer; border: none; }
+.btn-primary { background-color: #16a34a; color: white; }
+.btn-secondary { background-color: #3b82f6; color: white; }
+.active-mode { outline: 3px solid #000; font-size: 15px; }
+
+/* ==================== MODE 1: TATA LETAK EDITING (1 KARTU DI MONITOR) ==================== */
+.preview-container-box {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+.preview-container-box .desain-kartu-santri {
+  width: 140mm;   
+  height: 99.5mm; 
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  font-size: 16px; /* Ukuran dasar teks saat diedit di monitor */
+}
+
+/* ==================== MODE 2: FORMULASI 8 KARTU PER LEMBAR (GRID MEPET 2x4) ==================== */
+body.print-layout-active #main-display {
+  display: block;
+}
+.page {
+  width: 200mm;
+  height: 287mm;
+  display: grid;
+  grid-template-columns: 1fr 1fr;      /* 2 Kolom menyamping */
+  grid-template-rows: 1fr 1fr 1fr 1fr; /* 4 Baris ke bawah */
+  gap: 1mm 1mm;                        /* SPASI DIBUAT MEPET */
+  page-break-after: always;
+  box-sizing: border-box;
+  margin: 0 auto 10px auto;
+  padding: 2mm;
+}
+.card-box {
+  width: 100%; height: 100%;
+  display: flex; justify-content: center; align-items: center;
+  page-break-inside: avoid;
+}
+.print-layout-active .desain-kartu-santri {
+  width: 96mm;   /* Dioptimalkan lebarnya agar pas dengan kertas A4 */
+  height: 68mm;  /* Dioptimalkan tingginya agar 4 baris muat tegak lurus */
+  font-size: 10.5px; /* Ukuran dasar teks mengecil otomatis saat dicetak */
+}
+
+/* ==================== VISUAL KARTU & BACKGROUND IMAGE ==================== */
+.desain-kartu-santri {
+  background-image: url('Picture1.png'); 
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+  position: relative;
+  box-sizing: border-box;
+  overflow: hidden;
+  background-color: white;
+  border-radius: 2px;
+  
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+/* Item Teks Melayang */
+.txt-item {
+  position: absolute;
+  font-weight: bold;
+  color: #1a3020; 
+  line-height: 1.1;
+  white-space: nowrap; /* Mencegah nama turun merusak baris bawah jika terlalu panjang */
+}
+
+.txt-nama {
+  font-family: 'Georgia', serif; 
+  color: #111827;
+}
+
+.txt-kelas, .txt-keterangan {
+  color: #6b7280; 
+  font-weight: normal;
+}
+
+/* ==================== ATURAN HILANGKAN PANEL EDIT SAAT PRINT ==================== */
+@media print {
+  body { background: none; }
+  .no-print, #control-panel, .tabs { display: none !important; }
+  .preview-container-box { display: none !important; }
+  .page { margin: 0; padding: 0; border: none; width: 100%; height: 100%; }
+  
+  .desain-kartu-santri {
+    background-image: url('Picture1.png') !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 }
-
-function buatUIMapping() {
-  const container = document.getElementById('mapping-form');
-  container.innerHTML = '';
-  PLACEHOLDERS.forEach(p => {
-    const row = document.createElement('div');
-    row.className = 'form-row';
-    row.innerHTML = `<label>${p} :</label><select id="map-${p}"></select>`;
-    container.appendChild(row);
-    
-    const select = document.getElementById(`map-${p}`);
-    csvHeaders.forEach(h => {
-      let opt = new Option(h, h, false, kunciMapping[p] === h);
-      select.add(opt);
-    });
-    select.onchange = () => { kunciMapping[p] = select.value; updateTampilan(); };
-  });
-}
-
-function buatUIPosisi() {
-  const container = document.getElementById('position-form');
-  container.innerHTML = '';
-  KEYS.forEach(k => {
-    const section = document.createElement('div');
-    section.className = 'pos-section';
-    section.innerHTML = `
-      <h4>Teks: ${k.toUpperCase()}</h4>
-      <div class="slider-group">
-        <label>Atas (Y): <input type="range" min="0" max="100" value="${posisiTeks[k].top}" oninput="ubahPosisi('${k}', 'top', this.value)"></label>
-        <label>Kiri (X): <input type="range" min="0" max="100" value="${posisiTeks[k].left}" oninput="ubahPosisi('${k}', 'left', this.value)"></label>
-        <label>Ukuran Huruf (%): <input type="range" min="50" max="300" value="${posisiTeks[k].size}" oninput="ubahPosisi('${k}', 'size', this.value)"></label>
-      </div>
-    `;
-    container.appendChild(section);
-  });
-}
-
-function ubahPosisi(item, properti, nilai) {
-  posisiTeks[item][properti] = parseInt(nilai);
-  terapkanGayaCSSKonstan();
-}
-
-function switchTab(tabName) {
-  document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
-  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-  document.getElementById(`tab-${tabName}`).style.display = 'block';
-  document.getElementById(`btn-tab-${tabName}`).classList.add('active');
-}
-
-function setMode(mode) {
-  appMode = mode;
-  document.querySelectorAll('.panel-actions button').forEach(b => b.classList.remove('active-mode'));
-  if(mode === 'preview') {
-    document.getElementById('btn-mode-preview').classList.add('active-mode');
-    document.body.classList.remove('print-layout-active');
-  } else {
-    document.getElementById('btn-mode-print').classList.add('active-mode');
-    document.body.classList.add('print-layout-active');
-  }
-  updateTampilan();
-}
-
-function updateTampilan() {
-  const display = document.getElementById('main-display');
-  display.innerHTML = '';
-
-  if (csvRecords.length === 0) return;
-
-  if (appMode === "preview") {
-    let html = '<div class="preview-container-box">';
-    html += buatHtmlKartu(csvRecords[0], "previewmaster");
-    html += '</div>';
-    display.innerHTML = html;
-  } else {
-    let html = '<div class="page">';
-    let count = 0;
-    const keyNama = kunciMapping["{{NAMA}}"];
-
-    csvRecords.forEach((row, index) => {
-      if (!row[keyNama]) return;
-      // KUNCI UTAMA: Pecah halaman lembar baru setiap 8 KARTU
-      if (count > 0 && count % 8 === 0) html += '</div><div class="page">';
-      html += `<div class="card-box">${buatHtmlKartu(row, index)}</div>`;
-      count++;
-    });
-    html += '</div>';
-    display.innerHTML = html;
-  }
-  terapkanGayaCSSKonstan();
-}
-
-function buatHtmlKartu(row, id) {
-  let template = document.getElementById('card-template').innerHTML;
-  template = template.replaceAll('{{ID}}', id);
-  for (let [tag, kolom] of Object.entries(kunciMapping)) {
-    template = template.replaceAll(tag, row[kolom] || '');
-  }
-  return template;
-}
-
-function terapkanGayaCSSKonstan() {
-  KEYS.forEach(k => {
-    const elemenList = document.querySelectorAll(`.txt-${k}`);
-    elemenList.forEach(el => {
-      el.style.top = posisiTeks[k].top + '%';
-      el.style.left = posisiTeks[k].left + '%';
-      el.style.fontSize = posisiTeks[k].size + '%'; // Menggunakan % agar adaptif mengikuti ukuran kartu
-      el.style.width = posisiTeks[k].width + '%';
-      el.style.textAlign = posisiTeks[k].align;
-    });
-  });
-}
-
-function csvToArray(lines, headers) {
-  const result = [];
-  for (let i = 1; i < lines.length; i++) {
-    const pemisah = lines[i].includes(';') ? ';' : ',';
-    const currentline = lines[i].split(pemisah);
-    if (currentline.length < headers.length) continue;
-    const obj = {};
-    for (let j = 0; j < headers.length; j++) {
-      obj[headers[j]] = currentline[j] ? currentline[j].trim() : '';
-    }
-    result.push(obj);
-  }
-  return result;
-}
-
-window.onload = inisialisasiAplikasi;
