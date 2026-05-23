@@ -5,8 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sistem Cetak Kartu Santri Otomatis</title>
   <link rel="stylesheet" href="style.css">
-  <!-- Library Html2Pdf untuk cetak langsung ke file PDF -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script src="script.js"></script>
 </head>
 <body>
@@ -42,7 +40,7 @@
     <div class="panel-actions">
       <button id="btn-mode-preview" onclick="setMode('preview')" class="btn-secondary">✏️ Mode Edit (1 Kartu)</button>
       <button id="btn-mode-print" onclick="setMode('print')" class="btn-primary">🖨️ Kunci Tampilan (8 Kartu/Lembar)</button>
-      <button id="btn-download-pdf" onclick="unduhPDF()" class="btn-pdf" style="display:none;">📄 Download PDF Langsung</button>
+      <button id="btn-download-pdf" onclick="unduhPDF()" class="btn-pdf" style="display:none;">📄 Cetak / Simpan ke PDF</button>
     </div>
   </div>
 
@@ -56,7 +54,7 @@
       <div class="txt-item txt-kelas" id="preview-{{ID}}-kelas">{{KELAS}}</div>
       <div class="txt-item txt-keterangan" id="preview-{{ID}}-keterangan">Ket: {{KET}}</div>
       
-      <!-- FITUR CENTER: Nama Santri menggunakan container khusus -->
+      <!-- Nama Santri Center -->
       <div class="container-nama-center txt-nama" id="preview-{{ID}}-nama-box">
         <span>{{NAMA}}</span>
       </div>
