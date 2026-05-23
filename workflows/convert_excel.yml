@@ -3,7 +3,7 @@ name: Konversi Otomatis Excel ke CSV
 on:
   push:
     paths:
-      - '*.xlsx' # Robot hanya akan berjalan jika ada file .xlsx yang di-upload/diperbarui
+      - '**.[xX][lL][sS][xX]' # Kode ini membuat robot peka terhadap .xlsx maupun .XLSX
 
 jobs:
   convert:
@@ -29,5 +29,4 @@ jobs:
         git config --global user.name "GitHub Action Robot"
         git config --global user.email "actions@github.com"
         git add *.csv
-        # Hanya commit jika ada perubahan pada file CSV
         git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-convert: Excel ke CSV [skip ci]" && git push)
