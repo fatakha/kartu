@@ -1,5 +1,8 @@
-// ====== FITUR MAPPING DATA SANTRI ======
-const KUNCI_MAPPING = {
+// Placeholder yang kita gunakan di dalam kode HTML template
+const PLACEHOLDERS = ["{{NO}}", "{{NO_URUT}}", "{{KELAS}}", "{{NAMA}}", "{{PENGAMPU}}", "{{PENGUJI}}", "{{KET}}"];
+
+// Mapping default awal (jika namanya pas dengan Excel Anda)
+let kunciMapping = {
   "{{NO}}": "No",
   "{{NO_URUT}}": "No Urut",
   "{{KELAS}}": "Kelas",
@@ -9,53 +12,109 @@ const KUNCI_MAPPING = {
   "{{KET}}": "Keterangan"
 };
 
-// Fungsi otomatis membaca CSV dan melakukan "Next Record" per 6 kartu
-async function loadMailMerge() {
+let csvRecords = [];
+let csvHeaders = [];
+
+async function inisialisasiAplikasi() {
   try {
     const response = await fetch('data.csv');
     const dataText = await response.text();
-    const records = csvToArray(dataText);
     
-    let htmlOutput = '<div class="page">';
-    let cardCount = 0;
-
-    records.forEach((row) => {
-      // Abaikan jika baris kosong
-      if (!row["Nama Santri"]) return; 
-
-      // Setiap mencapai 6 kartu, tutup halaman lama dan buka halaman baru
-      if (cardCount > 0 && cardCount % 6 === 0) {
-        htmlOutput += '</div><div class="page">';
-      }
-
-      // Ambil master template desain dari HTML
-      let cardTemplate = document.getElementById('card-template').innerHTML;
-
-      // PROSES MAPPING OTOMATIS
-      for (let [tag, kolomSheet] of Object.entries(KUNCI_MAPPING)) {
-        cardTemplate = cardTemplate.replaceAll(tag, row[kolomSheet] || '');
-      }
-
-      // Masukkan kartu ke dalam grid halaman
-      htmlOutput += `<div class="card-box">${cardTemplate}</div>`;
-      cardCount++;
-    });
-
-    htmlOutput += '</div>';
-    document.getElementById('print-area').innerHTML = htmlOutput;
+    // Pecah data CSV
+    const lines = dataText.split('\n').map(line => line.trim()).filter(line => line !== "");
+    csvHeaders = lines[0].split(',').map(h => h.trim());
+    
+    // Simpan semua baris data ke variabel global
+    csvRecords = csvToArray(lines, csvHeaders);
+    
+    // Buat komponen UI Pengaturan secara otomatis berdasarkan header CSV yang ada
+    buatUIMapping();
+    
+    // Generate kartu pertama kali
+    generateKartu();
   } catch (error) {
-    console.error("Gagal memuat data CSV:", error);
+    console.error("Gagal memuat data.csv:", error);
+    document.getElementById('print-area').innerHTML = "<p style='color:red; padding:20px;'>Gagal memuat data.csv. Pastikan file data.csv sudah di-upload di folder yang sama.</p>";
   }
 }
 
-// Fungsi sederhana pengubah teks CSV menjadi Array of Objects
-function csvToArray(text) {
-  const lines = text.split('\n');
-  const headers = lines[0].split(',').map(h => h.trim());
-  const result = [];
+// Fungsi membuat form UI dropdown
+function buatUIMapping() {
+  const formContainer = document.getElementById('mapping-form');
+  formContainer.innerHTML = '';
+  
+  PLACEHOLDERS.forEach(placeholder => {
+    const row = document.createElement('div');
+    row.className = 'mapping-row';
+    
+    // Label nama tag template
+    const label = document.createElement('label');
+    label.innerText = `Tag ${placeholder} : `;
+    
+    // Dropdown pilihan kolom dari CSV
+    const select = document.createElement('select');
+    select.id = `map-${placeholder}`;
+    
+    csvHeaders.forEach(header => {
+      const option = document.createElement('option');
+      option.value = header;
+      option.text = header;
+      // Otomatis pilih jika nama mapping default cocok atau mendekati
+      if (kunciMapping[placeholder] === header) {
+        option.selected = true;
+      }
+      select.appendChild(option);
+    });
+    
+    row.appendChild(label);
+    row.appendChild(select);
+    formContainer.appendChild(row);
+  });
+}
 
+// Fungsi saat tombol "Terapkan" diklik oleh user
+function terapkanMapping() {
+  PLACEHOLDERS.forEach(placeholder => {
+    const selectElement = document.getElementById(`map-${placeholder}`);
+    kunciMapping[placeholder] = selectElement.value;
+  });
+  
+  // Generate ulang kartu setelah mapping diubah
+  generateKartu();
+}
+
+// Fungsi utama mail merge (looping next record)
+function generateKartu() {
+  let htmlOutput = '<div class="page">';
+  let cardCount = 0;
+  const targetCekHeader = kunciMapping["{{NAMA}}"];
+
+  csvRecords.forEach((row) => {
+    if (!row[targetCekHeader]) return; // Abaikan jika baris kosong
+
+    // Pindah halaman kertas setiap 6 kartu
+    if (cardCount > 0 && cardCount % 6 === 0) {
+      htmlOutput += '</div><div class="page">';
+    }
+
+    let cardTemplate = document.getElementById('card-template').innerHTML;
+
+    // Proses penggantian data berdasarkan mapping dari UI dropdown
+    for (let [tag, kolomSheet] of Object.entries(kunciMapping)) {
+      cardTemplate = cardTemplate.replaceAll(tag, row[kolomSheet] || '');
+    }
+
+    htmlOutput += `<div class="card-box">${cardTemplate}</div>`;
+    cardCount++;
+  });
+
+  htmlOutput += '</div>';
+  document.getElementById('print-area').innerHTML = htmlOutput;
+}
+
+function csvToArray(lines, headers) {
+  const result = [];
   for (let i = 1; i < lines.length; i++) {
-    if (!lines[i]) continue;
     const currentline = lines[i].split(',');
     if (currentline.length < headers.length) continue;
     
@@ -68,4 +127,4 @@ function csvToArray(text) {
   return result;
 }
 
-window.onload = loadMailMerge;
+window.onload = inisialisasiAplikasi;
