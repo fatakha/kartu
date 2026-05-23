@@ -5,11 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sistem Cetak Kartu Santri Otomatis</title>
   <link rel="stylesheet" href="style.css">
+  <!-- Library Html2Pdf untuk cetak langsung ke file PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script src="script.js"></script>
 </head>
 <body>
 
-  <!-- ==================== UI PANEL SETTING & EDITOR (TIDAK IKUT DICETAK) ==================== -->
+  <!-- ==================== UI PANEL SETTING & EDITOR ==================== -->
   <div id="control-panel" class="no-print">
     <h2>⚙️ Pengaturan & Editor Posisi Kartu (SD Alam Arrohmah)</h2>
     
@@ -18,43 +20,51 @@
       <button id="btn-tab-posisi" class="tab-btn" onclick="switchTab('posisi')">2. Edit Posisi Teks</button>
     </div>
 
-    <!-- Tab 1: Mapping Kolom -->
+    <!-- Tab 1: Mapping & Filter -->
     <div id="tab-mapping" class="tab-content">
-      <p>Cocokkan tanda template (kiri) dengan nama kolom di file Excel/CSV Anda (kanan):</p>
+      <div class="filter-box">
+        <label>🎯 <strong>Filter Berdasarkan Kelas:</strong></label>
+        <select id="filter-kelas" onchange="gantiFilterKelas()">
+          <option value="SEMUA">-- Tampilkan Semua Kelas --</option>
+        </select>
+      </div>
+      <hr style="border: 0; border-top: 1px solid #cbd5e1; margin: 15px 0;">
+      <p>Cocokkan tanda template dengan kolom Excel/CSV Anda:</p>
       <div class="mapping-grid" id="mapping-form"></div>
     </div>
 
     <!-- Tab 2: Pengatur Posisi -->
     <div id="tab-posisi" class="tab-content" style="display:none;">
-      <p>Geser nilai di bawah ini jika ingin mengubah posisi teks secara presisi di atas gambar:</p>
+      <p>Geser nilai di bawah ini untuk mengatur tata letak teks:</p>
       <div id="position-form"></div>
     </div>
     
     <div class="panel-actions">
       <button id="btn-mode-preview" onclick="setMode('preview')" class="btn-secondary">✏️ Mode Edit (1 Kartu)</button>
-      <button id="btn-mode-print" onclick="setMode('print')" class="btn-primary">🖨️ Kunci & Siapkan Cetak (6 Kartu/Lembar)</button>
+      <button id="btn-mode-print" onclick="setMode('print')" class="btn-primary">🖨️ Kunci Tampilan (8 Kartu/Lembar)</button>
+      <button id="btn-download-pdf" onclick="unduhPDF()" class="btn-pdf" style="display:none;">📄 Download PDF Langsung</button>
     </div>
   </div>
 
-  <!-- ==================== AREA UTAMA TAMPILAN (PREVIEW / CETAK) ==================== -->
+  <!-- ==================== AREA UTAMA TAMPILAN ==================== -->
   <div id="main-display"></div>
 
-  <!-- ==================== MASTER TEMPLATE SESUAI PICTURE1.JPG ==================== -->
+  <!-- ==================== MASTER TEMPLATE ==================== -->
   <template id="card-template">
     <div class="desain-kartu-santri">
-      
       <!-- Label Informasi Atas -->
       <div class="txt-item txt-kelas" id="preview-{{ID}}-kelas">{{KELAS}}</div>
       <div class="txt-item txt-keterangan" id="preview-{{ID}}-keterangan">Ket: {{KET}}</div>
       
-      <!-- Nama Santri Tengah (Besar) -->
-      <div class="txt-item txt-nama" id="preview-{{ID}}-nama">{{NAMA}}</div>
+      <!-- FITUR CENTER: Nama Santri menggunakan container khusus -->
+      <div class="container-nama-center txt-nama" id="preview-{{ID}}-nama-box">
+        <span>{{NAMA}}</span>
+      </div>
       
-      <!-- Baris Kolom Bawah Sejajar Ikon Picture1.jpg -->
+      <!-- Baris Kolom Bawah Sejajar Ikon -->
       <div class="txt-item txt-no-urut" id="preview-{{ID}}-no-urut">{{NO_URUT}}</div>
       <div class="txt-item txt-penguji" id="preview-{{ID}}-penguji">{{PENGUJI}}</div>
       <div class="txt-item txt-pengampu" id="preview-{{ID}}-pengampu">{{PENGAMPU}}</div>
-      
     </div>
   </template>
 
