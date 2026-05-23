@@ -1,7 +1,7 @@
-// Placeholder yang kita gunakan di dalam kode HTML template
+// Daftar placeholder penanda yang kita pasang di dalam file index.html
 const PLACEHOLDERS = ["{{NO}}", "{{NO_URUT}}", "{{KELAS}}", "{{NAMA}}", "{{PENGAMPU}}", "{{PENGUJI}}", "{{KET}}"];
 
-// Mapping default awal (jika namanya pas dengan Excel Anda)
+// Pengaturan pemetaan default (otomatis mencocokkan jika namanya mirip dengan kolom Excel Anda)
 let kunciMapping = {
   "{{NO}}": "No",
   "{{NO_URUT}}": "No Urut",
@@ -15,30 +15,40 @@ let kunciMapping = {
 let csvRecords = [];
 let csvHeaders = [];
 
+// Fungsi utama yang berjalan otomatis saat halaman web dibuka
 async function inisialisasiAplikasi() {
   try {
+    // Membaca file data.csv yang sudah Anda upload di GitHub
     const response = await fetch('data.csv');
     const dataText = await response.text();
     
-    // Pecah data CSV
+    // Memecah teks per baris dan membuang baris yang kosong
     const lines = dataText.split('\n').map(line => line.trim()).filter(line => line !== "");
-    csvHeaders = lines[0].split(',').map(h => h.trim());
     
-    // Simpan semua baris data ke variabel global
+    if (lines.length === 0) {
+      document.getElementById('print-area').innerHTML = "<p style='color:red; padding:20px;'>File data.csv kosong atau formatnya salah.</p>";
+      return;
+    }
+
+    // Deteksi otomatis apakah CSV dipisah menggunakan koma (,) atau titik koma (;)
+    const pemisahHeader = lines[0].includes(';') ? ';' : ',';
+    csvHeaders = lines[0].split(pemisahHeader).map(h => h.trim());
+    
+    // Mengonversi data teks mentah menjadi susunan data Array objek
     csvRecords = csvToArray(lines, csvHeaders);
     
-    // Buat komponen UI Pengaturan secara otomatis berdasarkan header CSV yang ada
+    // Membuat komponen pilihan UI Dropdown Mapping secara otomatis
     buatUIMapping();
     
-    // Generate kartu pertama kali
+    // Membuat tampilan kartu untuk pertama kalinya
     generateKartu();
   } catch (error) {
     console.error("Gagal memuat data.csv:", error);
-    document.getElementById('print-area').innerHTML = "<p style='color:red; padding:20px;'>Gagal memuat data.csv. Pastikan file data.csv sudah di-upload di folder yang sama.</p>";
+    document.getElementById('print-area').innerHTML = "<p style='color:red; padding:20px;'>Gagal memuat file data.csv. Pastikan file data.csv diletakkan di folder utama repositori Anda.</p>";
   }
 }
 
-// Fungsi membuat form UI dropdown
+// Fungsi untuk merender/membuat formulir pengaturan di atas halaman web
 function buatUIMapping() {
   const formContainer = document.getElementById('mapping-form');
   formContainer.innerHTML = '';
@@ -47,11 +57,9 @@ function buatUIMapping() {
     const row = document.createElement('div');
     row.className = 'mapping-row';
     
-    // Label nama tag template
     const label = document.createElement('label');
-    label.innerText = `Tag ${placeholder} : `;
+    label.innerText = `Tag ${placeholder} -> Hubungkan ke Kolom: `;
     
-    // Dropdown pilihan kolom dari CSV
     const select = document.createElement('select');
     select.id = `map-${placeholder}`;
     
@@ -59,7 +67,8 @@ function buatUIMapping() {
       const option = document.createElement('option');
       option.value = header;
       option.text = header;
-      // Otomatis pilih jika nama mapping default cocok atau mendekati
+      
+      // Jika nama kolom default cocok dengan header Excel, otomatis langsung terpilih
       if (kunciMapping[placeholder] === header) {
         option.selected = true;
       }
@@ -72,38 +81,41 @@ function buatUIMapping() {
   });
 }
 
-// Fungsi saat tombol "Terapkan" diklik oleh user
+// Fungsi yang berjalan ketika Anda mengeklik tombol "Terapkan & Update Tampilan Kartu"
 function terapkanMapping() {
   PLACEHOLDERS.forEach(placeholder => {
     const selectElement = document.getElementById(`map-${placeholder}`);
     kunciMapping[placeholder] = selectElement.value;
   });
   
-  // Generate ulang kartu setelah mapping diubah
+  // Menggambar ulang kartu-kartu berdasarkan setelan baru Anda
   generateKartu();
 }
 
-// Fungsi utama mail merge (looping next record)
+// Fungsi utama "Mail Merge" (Next Record otomatis 6 kartu per halaman)
 function generateKartu() {
   let htmlOutput = '<div class="page">';
   let cardCount = 0;
-  const targetCekHeader = kunciMapping["{{NAMA}}"];
+  const kolomCekNama = kunciMapping["{{NAMA}}"];
 
   csvRecords.forEach((row) => {
-    if (!row[targetCekHeader]) return; // Abaikan jika baris kosong
+    // Abaikan baris jika kolom nama santri kosong
+    if (!row[kolomCekNama]) return; 
 
-    // Pindah halaman kertas setiap 6 kartu
+    // NEXT RECORD: Jika kartu sudah mencapai kelipatan 6, ganti halaman kertas baru (A4)
     if (cardCount > 0 && cardCount % 6 === 0) {
       htmlOutput += '</div><div class="page">';
     }
 
+    // Mengambil cetakan master template dari HTML
     let cardTemplate = document.getElementById('card-template').innerHTML;
 
-    // Proses penggantian data berdasarkan mapping dari UI dropdown
+    // Proses penggantian otomatis tag {{...}} menjadi data asli dari baris Excel Anda
     for (let [tag, kolomSheet] of Object.entries(kunciMapping)) {
       cardTemplate = cardTemplate.replaceAll(tag, row[kolomSheet] || '');
     }
 
+    // Memasukkan hasil kartu ke kotak cetak
     htmlOutput += `<div class="card-box">${cardTemplate}</div>`;
     cardCount++;
   });
@@ -112,19 +124,23 @@ function generateKartu() {
   document.getElementById('print-area').innerHTML = htmlOutput;
 }
 
+// Fungsi pembantu: Mengubah baris teks CSV menjadi format data siap pakai
 function csvToArray(lines, headers) {
   const result = [];
   for (let i = 1; i < lines.length; i++) {
-    const currentline = lines[i].split(',');
+    const pemisah = lines[i].includes(';') ? ';' : ',';
+    const currentline = lines[i].split(pemisah);
+    
     if (currentline.length < headers.length) continue;
     
     const obj = {};
     for (let j = 0; j < headers.length; j++) {
-      obj[headers[j]] = currentline[j].trim();
+      obj[headers[j]] = currentline[j] ? currentline[j].trim() : '';
     }
     result.push(obj);
   }
   return result;
 }
 
+// Daftarkan fungsi agar langsung menyala saat website selesai loading
 window.onload = inisialisasiAplikasi;
