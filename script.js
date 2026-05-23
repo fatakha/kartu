@@ -6,14 +6,14 @@ let kunciMapping = {
   "{{NAMA}}": "Nama Santri", "{{PENGAMPU}}": "Pengampu", "{{PENGUJI}}": "Penguji", "{{KET}}": "Keterangan"
 };
 
-// Koordinat Presisi Berdasarkan Letak Elemen Pada Picture1.jpg
+// Ukuran huruf diubah ke % agar proporsional dan tidak bertabrakan lagi
 let posisiTeks = {
-  "kelas":      { top: 5,  left: 3,  size: 11, width: 25, align: 'left' },
-  "keterangan": { top: 5,  left: 72, size: 11, width: 25, align: 'right' },
-  "nama":       { top: 58, left: 5,  size: 24, width: 90, align: 'center' }, // Nama Santri Besar di Tengah
-  "no-urut":    { top: 81, left: 23, size: 12, width: 10, align: 'left' },   // Pas di kanan tulisan No. Urut :
-  "penguji":    { top: 81, left: 47, size: 12, width: 20, align: 'left' },   // Pas di kanan tulisan Nama Penguji :
-  "pengampu":   { top: 81, left: 74, size: 12, width: 20, align: 'left' }    // Pas di kanan tulisan Nama Pengampu :
+  "kelas":      { top: 5,  left: 3,  size: 100, width: 25, align: 'left' },
+  "keterangan": { top: 5,  left: 72, size: 100, width: 25, align: 'right' },
+  "nama":       { top: 56, left: 5,  size: 160, width: 90, align: 'center' }, // Mengecil agar pas di tengah
+  "no-urut":    { top: 81, left: 22, size: 100, width: 10, align: 'left' },
+  "penguji":    { top: 81, left: 47, size: 100, width: 20, align: 'left' },
+  "pengampu":   { top: 81, left: 74, size: 100, width: 20, align: 'left' }
 };
 
 let csvRecords = [];
@@ -34,7 +34,7 @@ async function inisialisasiAplikasi() {
     buatUIPosisi();
     updateTampilan();
   } catch (error) {
-    document.getElementById('main-display').innerHTML = "<p style='color:red; padding:20px;'>Gagal memuat data.csv. Pastikan file data.csv berada di folder utama repositori.</p>";
+    document.getElementById('main-display').innerHTML = "<p style='color:red; padding:20px;'>Gagal memuat data.csv.</p>";
   }
 }
 
@@ -67,7 +67,7 @@ function buatUIPosisi() {
       <div class="slider-group">
         <label>Atas (Y): <input type="range" min="0" max="100" value="${posisiTeks[k].top}" oninput="ubahPosisi('${k}', 'top', this.value)"></label>
         <label>Kiri (X): <input type="range" min="0" max="100" value="${posisiTeks[k].left}" oninput="ubahPosisi('${k}', 'left', this.value)"></label>
-        <label>Ukuran Huruf: <input type="range" min="8" max="40" value="${posisiTeks[k].size}" oninput="ubahPosisi('${k}', 'size', this.value)"></label>
+        <label>Ukuran Huruf (%): <input type="range" min="50" max="300" value="${posisiTeks[k].size}" oninput="ubahPosisi('${k}', 'size', this.value)"></label>
       </div>
     `;
     container.appendChild(section);
@@ -117,7 +117,8 @@ function updateTampilan() {
 
     csvRecords.forEach((row, index) => {
       if (!row[keyNama]) return;
-      if (count > 0 && count % 6 === 0) html += '</div><div class="page">';
+      // KUNCI UTAMA: Pecah halaman lembar baru setiap 8 KARTU
+      if (count > 0 && count % 8 === 0) html += '</div><div class="page">';
       html += `<div class="card-box">${buatHtmlKartu(row, index)}</div>`;
       count++;
     });
@@ -142,7 +143,7 @@ function terapkanGayaCSSKonstan() {
     elemenList.forEach(el => {
       el.style.top = posisiTeks[k].top + '%';
       el.style.left = posisiTeks[k].left + '%';
-      el.style.fontSize = posisiTeks[k].size + 'px';
+      el.style.fontSize = posisiTeks[k].size + '%'; // Menggunakan % agar adaptif mengikuti ukuran kartu
       el.style.width = posisiTeks[k].width + '%';
       el.style.textAlign = posisiTeks[k].align;
     });
