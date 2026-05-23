@@ -83,7 +83,7 @@ body.print-layout-active #main-display {
 
 /* ==================== ENTITAS VISUAL KARTU & BACKGROUND IMAGE ==================== */
 .desain-kartu-santri {
-  background-image: url('Picture1.jpg'); /* Disesuaikan dengan nama file Picture1.jpg */
+  background-image: url('Picture1.png'); /* Disesuaikan dengan nama file Picture1.jpg */
   background-size: 100% 100%;
   background-repeat: no-repeat;
   background-position: center;
