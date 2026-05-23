@@ -9,33 +9,45 @@
 </head>
 <body>
 
-  <!-- ==================== UI PANEL SETTING MAPPING (TIDAK IKUT DICETAK) ==================== -->
-  <div id="mapping-panel" class="no-print">
-    <h3>⚙️ Pengaturan Mapping Kolom Kartu</h3>
-    <p>Cocokkan tanda template (kiri) dengan nama kolom yang ada di file Excel/CSV Anda (kanan):</p>
+  <!-- ==================== UI PANEL SETTING & EDITOR (TIDAK IKUT DICETAK) ==================== -->
+  <div id="control-panel" class="no-print">
+    <h2>⚙️ Pengaturan & Editor Posisi Kartu</h2>
     
-    <div class="mapping-grid" id="mapping-form">
-      <!-- Dropdown pilihan kolom akan muncul otomatis di sini lewat JavaScript -->
+    <div class="tabs">
+      <button id="btn-tab-mapping" class="tab-btn active" onclick="switchTab('mapping')">1. Mapping Kolom</button>
+      <button id="btn-tab-posisi" class="tab-btn" onclick="switchTab('posisi')">2. Edit Posisi Teks</button>
+    </div>
+
+    <!-- Tab 1: Mapping Kolom -->
+    <div id="tab-mapping" class="tab-content">
+      <p>Cocokkan tanda template (kiri) dengan nama kolom di file Excel/CSV Anda (kanan):</p>
+      <div class="mapping-grid" id="mapping-form"></div>
+    </div>
+
+    <!-- Tab 2: Pengatur Posisi -->
+    <div id="tab-posisi" class="tab-content" style="display:none;">
+      <p>Geser nilai di bawah ini untuk mengatur letak teks langsung pada gambar kartu:</p>
+      <div id="position-form"></div>
     </div>
     
-    <button onclick="terapkanMapping()" class="btn-apply">Terapkan & Update Tampilan Kartu</button>
+    <div class="panel-actions">
+      <button id="btn-mode-preview" onclick="setMode('preview')" class="btn-secondary">✏️ Mode Edit (1 Kartu)</button>
+      <button id="btn-mode-print" onclick="setMode('print')" class="btn-primary">🖨️ Kunci & Siapkan Cetak (6 Kartu/Lembar)</button>
+    </div>
   </div>
 
-  <!-- ==================== AREA HASIL MERGE KARTU SIAP CETAK ==================== -->
-  <div id="print-area"></div>
+  <!-- ==================== AREA UTAMA TAMPILAN (PREVIEW / CETAK) ==================== -->
+  <div id="main-display"></div>
 
-  <!-- ==================== MASTER TEMPLATE DESAIN KARTU (DISUBSTITUSI OTOMATIS) ==================== -->
+  <!-- ==================== MASTER TEMPLATE UNTUK GENERATOR ==================== -->
   <template id="card-template">
     <div class="desain-kartu-santri">
-      
-      <!-- Komponen teks data melayang di atas gambar Picture1.png -->
-      <div class="txt-no-urut">No. Urut: {{NO_URUT}}</div>
-      <div class="txt-kelas">Kelas: {{KELAS}}</div>
-      <div class="txt-nama">{{NAMA}}</div>
-      <div class="txt-pengampu">Pengampu: {{PENGAMPU}}</div>
-      <div class="txt-penguji">Penguji: {{PENGUJI}}</div>
-      <div class="txt-keterangan">Ket: {{KET}}</div>
-
+      <div class="txt-item txt-no-urut" id="preview-{{ID}}-no-urut">No. Urut: {{NO_URUT}}</div>
+      <div class="txt-item txt-kelas" id="preview-{{ID}}-kelas">Kelas: {{KELAS}}</div>
+      <div class="txt-item txt-nama" id="preview-{{ID}}-nama">{{NAMA}}</div>
+      <div class="txt-item txt-pengampu" id="preview-{{ID}}-pengampu">Pengampu: {{PENGAMPU}}</div>
+      <div class="txt-item txt-penguji" id="preview-{{ID}}-penguji">Penguji: {{PENGUJI}}</div>
+      <div class="txt-item txt-keterangan" id="preview-{{ID}}-keterangan">Ket: {{KET}}</div>
     </div>
   </template>
 
