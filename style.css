@@ -1,35 +1,127 @@
-/* Styling untuk UI Panel Setting Mapping */
+/* ==================== ATURAN DASAR CETAK BRWOSER (KERTAS A4) ==================== */
+@page {
+  size: A4;
+  margin: 12mm 10mm; /* Jarak batas aman cetak printer kiri-kanan-atas-bawah */
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f1f5f9;
+}
+
+/* ==================== FORMULASI 6 KARTU PER LEMBAR (GRID 3 BARIS x 2 KOLOM) ==================== */
+.page {
+  width: 190mm;
+  height: 273mm;
+  display: grid;
+  grid-template-columns: 1fr 1fr;    /* Membagi menjadi 2 Kolom */
+  grid-template-rows: 1fr 1fr 1fr;   /* Membagi menjadi 3 Baris */
+  gap: 5mm;                          /* Jarak pemisah potong antar kartu */
+  page-break-after: always;          /* Memaksa ganti lembar halaman setelah kartu ke-6 */
+  box-sizing: border-box;
+}
+
+.card-box {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  page-break-inside: avoid;          /* Mencegah kartu terpotong robek di ujung kertas */
+}
+
+/* ==================== ATURAN FRAME KARTU & TEMPLATE PICTURE1.PNG ==================== */
+.desain-kartu-santri {
+  width: 90mm;
+  height: 85mm;
+  
+  /* Memanggil gambar desain Anda yang ada di GitHub */
+  background-image: url('Picture1.png'); 
+  background-size: 100% 100%;            /* Memaksa gambar pas mengikuti ukuran mm kartu */
+  background-repeat: no-repeat;
+  background-position: center;
+  
+  position: relative; /* Wajib ada agar koordinat teks melayang di bawah bisa aktif */
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* ==================== FORM PENGATURAN GEOMETRI KOORDINAT TULISAN ==================== */
+/* Catatan: Silakan ubah angka mm pada 'top' dan 'left' di bawah ini untuk menggeser teks agar pas dengan kotak gambar Anda */
+
+.txt-no-urut {
+  position: absolute;
+  top: 10mm;
+  left: 10mm;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.txt-kelas {
+  position: absolute;
+  top: 10mm;
+  right: 10mm;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.txt-nama {
+  position: absolute;
+  top: 35mm;          /* Mengatur jarak naik turun nama dari atas kartu */
+  left: 5mm;          /* Mengatur jarak geser kiri kanan nama */
+  width: 80mm;        /* Pembatasan area agar nama panjang tidak meluber */
+  text-align: center; /* Membuat nama otomatis di tengah-tengah kartu */
+  font-size: 15px;
+  font-weight: bold;
+  color: #000000;
+}
+
+.txt-pengampu {
+  position: absolute;
+  top: 55mm;
+  left: 12mm;
+  font-size: 12px;
+}
+
+.txt-penguji {
+  position: absolute;
+  top: 62mm;
+  left: 12mm;
+  font-size: 12px;
+}
+
+.txt-keterangan {
+  position: absolute;
+  top: 72mm;
+  left: 12mm;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+/* ==================== PANEL UI SETTING MAPPING (TAMPILAN KOMPUTER) ==================== */
 #mapping-panel {
   background-color: #ffffff;
   border: 2px solid #3b82f6;
   border-radius: 8px;
   padding: 15px;
   margin: 20px auto;
-  max-width: 600px;
-  font-family: Arial, sans-serif;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  max-width: 550px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
 }
-#mapping-panel h3 { margin-top: 0; color: #1e3a8a; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; }
-.mapping-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 15px; }
+#mapping-panel h3 { margin-top: 0; color: #1d4ed8; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; }
+.mapping-grid { display: grid; grid-template-columns: 1fr; gap: 8px; margin-bottom: 15px; }
 .mapping-row { display: flex; justify-content: space-between; align-items: center; }
-.mapping-row label { font-size: 13px; font-weight: bold; color: #4b5563; }
-.mapping-row select { padding: 6px; width: 60%; border-radius: 4px; border: 1px solid #cbd5e1; }
-.btn-apply {
-  background-color: #3b82f6;
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  width: 100%;
-  border-radius: 5px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background 0.2s;
-}
+.mapping-row label { font-size: 12px; font-weight: bold; color: #475569; }
+.mapping-row select { padding: 5px; width: 55%; border-radius: 4px; border: 1px solid #cbd5e1; font-size: 12px; }
+.btn-apply { background-color: #2563eb; color: white; border: none; padding: 10px; width: 100%; border-radius: 5px; font-weight: bold; cursor: pointer; }
 .btn-apply:hover { background-color: #1d4ed8; }
 
-/* === KUNCI UTAMA: Menyembunyikan UI saat tombol Print ditekan === */
+/* ==================== ATURAN PENTING: HILANGKAN PANEL UI SAAT TOMBOL PRINT DIKLIK ==================== */
 @media print {
+  body { background: none; }
   .no-print, #mapping-panel {
-    display: none !important;
+    display: none !important; /* Panel pengaturan otomatis lenyap saat dicetak ke kertas */
   }
 }
