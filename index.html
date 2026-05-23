@@ -2,20 +2,31 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Cetak Kartu Santri otomatis</title>
+  <title>Cetak Kartu Santri Otomatis</title>
   <link rel="stylesheet" href="style.css">
+  <!-- Pustaka tambahan untuk membaca file excel/csv jika dibutuhkan di masa depan -->
   <script src="script.js"></script>
 </head>
 <body>
 
-  <!-- Tempat menampung lembaran hasil merge yang siap diprint -->
+  <!-- ==================== UI PANEL SETTING MAPPING ==================== -->
+  <div id="mapping-panel" class="no-print">
+    <h3>⚙️ Pengaturan Mapping Kolom</h3>
+    <p>Sesuaikan placeholder template (kiri) dengan nama kolom di data CSV Anda (kanan):</p>
+    
+    <div class="mapping-grid" id="mapping-form">
+      <!-- Form dropdown akan dibuat otomatis oleh JavaScript di sini -->
+    </div>
+    
+    <button onclick="terapkanMapping()" class="btn-apply">Terapkan & Generate Kartu</button>
+  </div>
+
+  <!-- Area Hasil Cetak Mail Merge -->
   <div id="print-area"></div>
 
   <!-- ==================== TEMPLATE DESAIN KARTU ANDA ==================== -->
   <template id="card-template">
     <div class="desain-kartu-santri">
-      
-      <!-- Contoh Layout Konten: Silakan sesuaikan letaknya dengan desain Anda -->
       <div class="card-header">
         <span class="kelas">Kelas: {{KELAS}}</span>
         <span class="no-urut">Urut: {{NO_URUT}}</span>
@@ -32,7 +43,6 @@
       <div class="card-footer">
         <span class="status">Ket: {{KET}}</span>
       </div>
-
     </div>
   </template>
 
