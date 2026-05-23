@@ -1,6 +1,7 @@
 const KEYS = ["kelas", "keterangan", "nama", "no-urut", "penguji", "pengampu"];
 const PLACEHOLDERS = ["{{NO}}", "{{NO_URUT}}", "{{KELAS}}", "{{NAMA}}", "{{PENGAMPU}}", "{{PENGUJI}}", "{{KET}}"];
 
+// Default awal jika file settings.json belum ada di GitHub Anda
 let kunciMapping = {
   "{{NO}}": "No", "{{NO_URUT}}": "No Urut", "{{KELAS}}": "Kelas",
   "{{NAMA}}": "Nama Santri", "{{PENGAMPU}}": "Pengampu", "{{PENGUJI}}": "Penguji", "{{KET}}": "Keterangan"
@@ -21,6 +22,25 @@ let appMode = "preview";
 let kelasTerfilter = "SEMUA";
 
 async function inisialisasiAplikasi() {
+  // 1. Ambil settingan mapping & posisi yang tersimpan di GitHub dahulu
+  try {
+    const configResponse = await fetch('settings.json');
+    if (configResponse.ok) {
+      const configData = await configResponse.json();
+      if (configData.kunciMapping) kunciMapping = configData.kunciMapping;
+      if (configData.posisiTeks) posisiTeks = configData.posisiTeks;
+      document.getElementById('sync-status').className = "sync-info sync-success";
+      document.getElementById('sync-status').innerHTML = "✅ Konfigurasi berhasil dimuat dari GitHub (settings.json)";
+    } else {
+      document.getElementById('sync-status').className = "sync-info sync-warning";
+      document.getElementById('sync-status').innerHTML = "⚠️ Menggunakan settingan bawaan (Belum ada file settings.json)";
+    }
+  } catch (e) {
+    document.getElementById('sync-status').className = "sync-info sync-warning";
+    document.getElementById('sync-status').innerHTML = "⚠️ Menggunakan settingan bawaan.";
+  }
+
+  // 2. Memuat data CSV utama
   try {
     const response = await fetch('data.csv');
     const dataText = await response.text();
@@ -35,7 +55,7 @@ async function inisialisasiAplikasi() {
     perbaruiOpsiFilterKelas();
     updateTampilan();
   } catch (error) {
-    document.getElementById('main-display').innerHTML = "<p style='color:red; padding:20px;'>Gagal memuat data.csv.</p>";
+    document.getElementById('main-display').innerHTML = "<p style='color:red; padding:20px;'>Gagal memuat data.csv. Pastikan file data.csv sudah diupload ke GitHub.</p>";
   }
 }
 
@@ -43,9 +63,11 @@ function perbaruiOpsiFilterKelas() {
   const selectFilter = document.getElementById('filter-kelas');
   const kolomKelas = kunciMapping["{{KELAS}}"];
   let daftarKelas = new Set();
+  
   csvRecords.forEach(row => {
     if (row[kolomKelas]) daftarKelas.add(row[kolomKelas].trim());
   });
+
   selectFilter.innerHTML = '<option value="SEMUA">-- Tampilkan Semua Kelas --</option>';
   Array.from(daftarKelas).sort().forEach(namaKelas => {
     let opt = new Option(namaKelas, namaKelas);
@@ -213,7 +235,24 @@ function csvToArray(lines, headers) {
   return result;
 }
 
-// SOLUSI SIMETRIS: Menggunakan print engine bawaan browser yang jauh lebih akurat
+// FUNGSI EKSPOR SETTINGAN KE FILE JSON
+function simpanKeJSON() {
+  const dataKonfigurasi = {
+    kunciMapping: kunciMapping,
+    posisiTeks: posisiTeks
+  };
+  
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataKonfigurasi, null, 2));
+  const downloadAnchorNode = document.createElement('a');
+  downloadAnchorNode.setAttribute("href", dataStr);
+  downloadAnchorNode.setAttribute("download", "settings.json");
+  document.body.appendChild(downloadAnchorNode);
+  downloadAnchorNode.click();
+  downloadAnchorNode.remove();
+  
+  alert("File 'settings.json' berhasil diunduh!\n\nSilakan upload file ini ke akun GitHub Anda di dalam folder yang sama dengan index.html agar tersimpan permanen.");
+}
+
 function unduhPDF() {
   window.print();
 }
