@@ -11,7 +11,7 @@
 
   <!-- ==================== UI PANEL SETTING & EDITOR (TIDAK IKUT DICETAK) ==================== -->
   <div id="control-panel" class="no-print">
-    <h2>⚙️ Pengaturan & Editor Posisi Kartu</h2>
+    <h2>⚙️ Pengaturan & Editor Posisi Kartu (SD Alam Arrohmah)</h2>
     
     <div class="tabs">
       <button id="btn-tab-mapping" class="tab-btn active" onclick="switchTab('mapping')">1. Mapping Kolom</button>
@@ -26,7 +26,7 @@
 
     <!-- Tab 2: Pengatur Posisi -->
     <div id="tab-posisi" class="tab-content" style="display:none;">
-      <p>Geser nilai di bawah ini untuk mengatur letak teks langsung pada gambar kartu:</p>
+      <p>Geser nilai di bawah ini jika ingin mengubah posisi teks secara presisi di atas gambar:</p>
       <div id="position-form"></div>
     </div>
     
@@ -39,15 +39,22 @@
   <!-- ==================== AREA UTAMA TAMPILAN (PREVIEW / CETAK) ==================== -->
   <div id="main-display"></div>
 
-  <!-- ==================== MASTER TEMPLATE UNTUK GENERATOR ==================== -->
+  <!-- ==================== MASTER TEMPLATE SESUAI PICTURE1.JPG ==================== -->
   <template id="card-template">
     <div class="desain-kartu-santri">
-      <div class="txt-item txt-no-urut" id="preview-{{ID}}-no-urut">No. Urut: {{NO_URUT}}</div>
-      <div class="txt-item txt-kelas" id="preview-{{ID}}-kelas">Kelas: {{KELAS}}</div>
-      <div class="txt-item txt-nama" id="preview-{{ID}}-nama">{{NAMA}}</div>
-      <div class="txt-item txt-pengampu" id="preview-{{ID}}-pengampu">Pengampu: {{PENGAMPU}}</div>
-      <div class="txt-item txt-penguji" id="preview-{{ID}}-penguji">Penguji: {{PENGUJI}}</div>
+      
+      <!-- Label Informasi Atas -->
+      <div class="txt-item txt-kelas" id="preview-{{ID}}-kelas">{{KELAS}}</div>
       <div class="txt-item txt-keterangan" id="preview-{{ID}}-keterangan">Ket: {{KET}}</div>
+      
+      <!-- Nama Santri Tengah (Besar) -->
+      <div class="txt-item txt-nama" id="preview-{{ID}}-nama">{{NAMA}}</div>
+      
+      <!-- Baris Kolom Bawah Sejajar Ikon Picture1.jpg -->
+      <div class="txt-item txt-no-urut" id="preview-{{ID}}-no-urut">{{NO_URUT}}</div>
+      <div class="txt-item txt-penguji" id="preview-{{ID}}-penguji">{{PENGUJI}}</div>
+      <div class="txt-item txt-pengampu" id="preview-{{ID}}-pengampu">{{PENGAMPU}}</div>
+      
     </div>
   </template>
 
