@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Cetak Kartu Santri otomatis</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js"></script>
+</head>
+<body>
+
+  <!-- Tempat menampung lembaran hasil merge yang siap diprint -->
+  <div id="print-area"></div>
+
+  <!-- ==================== TEMPLATE DESAIN KARTU ANDA ==================== -->
+  <template id="card-template">
+    <div class="desain-kartu-santri">
+      
+      <!-- Contoh Layout Konten: Silakan sesuaikan letaknya dengan desain Anda -->
+      <div class="card-header">
+        <span class="kelas">Kelas: {{KELAS}}</span>
+        <span class="no-urut">Urut: {{NO_URUT}}</span>
+      </div>
+      
+      <div class="card-body">
+        <h3 class="nama-santri">{{NAMA}}</h3>
+        <table class="detail-table">
+          <tr><td>Pengampu</td><td>: {{PENGAMPU}}</td></tr>
+          <tr><td>Penguji</td><td>: {{PENGUJI}}</td></tr>
+        </table>
+      </div>
+
+      <div class="card-footer">
+        <span class="status">Ket: {{KET}}</span>
+      </div>
+
+    </div>
+  </template>
+
+</body>
+</html>
