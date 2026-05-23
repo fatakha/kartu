@@ -51,9 +51,10 @@ body {
   padding: 20px;
 }
 .preview-container-box .desain-kartu-santri {
-  width: 140mm;   /* Skala besar agar mudah menggeser slider */
-  height: 93.3mm; /* Menjaga rasio landscape gambar Picture1.png */
+  width: 140mm;   
+  height: 93.3mm; 
   box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  font-size: 16px; /* Mengunci basis ukuran huruf saat mode edit */
 }
 
 /* ==================== MODE 2: TATA LETAK READY CETAK (6 KARTU PER LEMBAR A4) ==================== */
@@ -64,9 +65,9 @@ body.print-layout-active #main-display {
   width: 190mm;
   height: 273mm;
   display: grid;
-  grid-template-columns: 1fr 1fr;  /* 2 Kolom menyamping */
-  grid-template-rows: 1fr 1fr 1fr; /* 3 Baris ke bawah */
-  gap: 8mm 5mm;                    /* Jarak potong aman vertikal dan horizontal */
+  grid-template-columns: 1fr 1fr;  
+  grid-template-rows: 1fr 1fr 1fr; 
+  gap: 8mm 5mm;                    
   page-break-after: always;
   box-sizing: border-box;
   margin: 0 auto 20px auto;
@@ -77,13 +78,14 @@ body.print-layout-active #main-display {
   page-break-inside: avoid;
 }
 .print-layout-active .desain-kartu-santri {
-  width: 90mm;  /* Ukuran asli saat masuk kertas cetak A4 */
-  height: 60mm; /* Tinggi yang proporsional agar gambar Picture1.jpg tidak gepeng */
+  width: 90mm;  
+  height: 60mm; 
+  font-size: 10px; /* SOLUSI: Mengecilkan basis ukuran huruf secara otomatis saat masuk mode cetak 6 kartu */
 }
 
 /* ==================== ENTITAS VISUAL KARTU & BACKGROUND IMAGE ==================== */
 .desain-kartu-santri {
-  background-image: url('Picture1.png'); /* Disesuaikan dengan nama file Picture1.jpg */
+  background-image: url('Picture1.png'); 
   background-size: 100% 100%;
   background-repeat: no-repeat;
   background-position: center;
@@ -92,23 +94,27 @@ body.print-layout-active #main-display {
   overflow: hidden;
   background-color: white;
   border-radius: 4px;
+  
+  /* Memaksa printer agar tetap memuat gambar ini saat dicetak */
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
 }
 
-/* Item Teks Melayang */
+/* Item Teks Melayang (Menggunakan EM bukan PX agar huruf mengecil proporsional mengikuti ukuran kartu) */
 .txt-item {
   position: absolute;
   font-weight: bold;
-  color: #1a3020; /* Warna hijau tua gelap agar serasi dengan ornamen masjid */
+  color: #1a3020; 
   line-height: 1.2;
 }
 
 .txt-nama {
-  font-family: 'Georgia', serif; /* Font nama dibuat lebih anggun/formal */
+  font-family: 'Georgia', serif; 
   color: #111827;
 }
 
 .txt-kelas, .txt-keterangan {
-  color: #6b7280; /* Warna abu-abu elegan untuk info pojok atas */
+  color: #6b7280; 
   font-weight: normal;
 }
 
@@ -118,4 +124,11 @@ body.print-layout-active #main-display {
   .no-print, #control-panel, .tabs { display: none !important; }
   .preview-container-box { display: none !important; }
   .page { margin: 0; border: none; }
+  
+  /* Memastikan gambar latar belakang dipaksa muncul di lembar cetak semua browser */
+  .desain-kartu-santri {
+    background-image: url('Picture1.png') !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
+  }
 }
