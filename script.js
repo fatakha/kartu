@@ -6,11 +6,11 @@ let kunciMapping = {
   "{{NAMA}}": "Nama Santri", "{{PENGAMPU}}": "Pengampu", "{{PENGUJI}}": "Penguji", "{{KET}}": "Keterangan"
 };
 
-// Ukuran huruf diubah ke % agar proporsional dan tidak bertabrakan lagi
+// Pengaturan default awal (Nama Santri dikunci di tengah secara vertikal & horizontal)
 let posisiTeks = {
   "kelas":      { top: 5,  left: 3,  size: 100, width: 25, align: 'left' },
   "keterangan": { top: 5,  left: 72, size: 100, width: 25, align: 'right' },
-  "nama":       { top: 56, left: 5,  size: 160, width: 90, align: 'center' }, // Mengecil agar pas di tengah
+  "nama":       { top: 48, left: 5,  size: 155, width: 90, align: 'center' }, // Nilai "top" di sini mengontrol poros tengah tinggi nama
   "no-urut":    { top: 81, left: 22, size: 100, width: 10, align: 'left' },
   "penguji":    { top: 81, left: 47, size: 100, width: 20, align: 'left' },
   "pengampu":   { top: 81, left: 74, size: 100, width: 20, align: 'left' }
@@ -19,6 +19,7 @@ let posisiTeks = {
 let csvRecords = [];
 let csvHeaders = [];
 let appMode = "preview";
+let kelasTerfilter = "SEMUA";
 
 async function inisialisasiAplikasi() {
   try {
@@ -32,10 +33,36 @@ async function inisialisasiAplikasi() {
     
     buatUIMapping();
     buatUIPosisi();
+    perbaruiOpsiFilterKelas();
     updateTampilan();
   } catch (error) {
     document.getElementById('main-display').innerHTML = "<p style='color:red; padding:20px;'>Gagal memuat data.csv.</p>";
   }
+}
+
+function perbaruiOpsiFilterKelas() {
+  const selectFilter = document.getElementById('filter-kelas');
+  const kolomKelas = kunciMapping["{{KELAS}}"];
+  
+  // Ambil semua data kelas unik
+  let daftarKelas = new Set();
+  csvRecords.forEach(row => {
+    if (row[kolomKelas]) daftarKelas.add(row[kolomKelas].trim());
+  });
+
+  // Kosongkan kecuali opsi "SEMUA"
+  selectFilter.innerHTML = '<option value="SEMUA">-- Tampilkan Semua Kelas --</option>';
+  
+  // Masukkan daftar kelas hasil filter
+  Array.from(daftarKelas).sort().forEach(namaKelas => {
+    let opt = new Option(namaKelas, namaKelas);
+    selectFilter.add(opt);
+  });
+}
+
+function gantiFilterKelas() {
+  kelasTerfilter = document.getElementById('filter-kelas').value;
+  updateTampilan();
 }
 
 function buatUIMapping() {
@@ -52,7 +79,11 @@ function buatUIMapping() {
       let opt = new Option(h, h, false, kunciMapping[p] === h);
       select.add(opt);
     });
-    select.onchange = () => { kunciMapping[p] = select.value; updateTampilan(); };
+    select.onchange = () => { 
+      kunciMapping[p] = select.value; 
+      if (p === "{{KELAS}}") perbaruiOpsiFilterKelas();
+      updateTampilan(); 
+    };
   });
 }
 
@@ -60,14 +91,15 @@ function buatUIPosisi() {
   const container = document.getElementById('position-form');
   container.innerHTML = '';
   KEYS.forEach(k => {
+    let labelNama = k === 'nama' ? 'Tinggi Poros (Y)' : 'Atas (Y)';
     const section = document.createElement('div');
     section.className = 'pos-section';
     section.innerHTML = `
-      <h4>Teks: ${k.toUpperCase()}</h4>
+      <h4>TEKS: ${k.toUpperCase()}</h4>
       <div class="slider-group">
-        <label>Atas (Y): <input type="range" min="0" max="100" value="${posisiTeks[k].top}" oninput="ubahPosisi('${k}', 'top', this.value)"></label>
+        <label>${labelNama}: <input type="range" min="0" max="100" value="${posisiTeks[k].top}" oninput="ubahPosisi('${k}', 'top', this.value)"></label>
         <label>Kiri (X): <input type="range" min="0" max="100" value="${posisiTeks[k].left}" oninput="ubahPosisi('${k}', 'left', this.value)"></label>
-        <label>Ukuran Huruf (%): <input type="range" min="50" max="300" value="${posisiTeks[k].size}" oninput="ubahPosisi('${k}', 'size', this.value)"></label>
+        <label>Ukuran (%): <input type="range" min="50" max="300" value="${posisiTeks[k].size}" oninput="ubahPosisi('${k}', 'size', this.value)"></label>
       </div>
     `;
     container.appendChild(section);
@@ -92,9 +124,11 @@ function setMode(mode) {
   if(mode === 'preview') {
     document.getElementById('btn-mode-preview').classList.add('active-mode');
     document.body.classList.remove('print-layout-active');
+    document.getElementById('btn-download-pdf').style.display = 'none';
   } else {
     document.getElementById('btn-mode-print').classList.add('active-mode');
     document.body.classList.add('print-layout-active');
+    document.getElementById('btn-download-pdf').style.display = 'inline-block';
   }
   updateTampilan();
 }
@@ -105,19 +139,31 @@ function updateTampilan() {
 
   if (csvRecords.length === 0) return;
 
+  const keyNama = kunciMapping["{{NAMA}}"];
+  const keyKelas = kunciMapping["{{KELAS}}"];
+
+  // Filter Rekor Berdasarkan Pilihan Dropdown Kelas
+  let dataTerfilter = csvRecords.filter(row => {
+    if (!row[keyNama]) return false;
+    if (kelasTerfilter !== "SEMUA" && row[keyKelas] !== kelasTerfilter) return false;
+    return true;
+  });
+
+  if (dataTerfilter.length === 0) {
+    display.innerHTML = "<p style='padding:20px; text-align:center; color:#64748b;'>Tidak ada data santri untuk kelas ini.</p>";
+    return;
+  }
+
   if (appMode === "preview") {
     let html = '<div class="preview-container-box">';
-    html += buatHtmlKartu(csvRecords[0], "previewmaster");
+    html += buatHtmlKartu(dataTerfilter[0], "previewmaster");
     html += '</div>';
     display.innerHTML = html;
   } else {
     let html = '<div class="page">';
     let count = 0;
-    const keyNama = kunciMapping["{{NAMA}}"];
 
-    csvRecords.forEach((row, index) => {
-      if (!row[keyNama]) return;
-      // KUNCI UTAMA: Pecah halaman lembar baru setiap 8 KARTU
+    dataTerfilter.forEach((row, index) => {
       if (count > 0 && count % 8 === 0) html += '</div><div class="page">';
       html += `<div class="card-box">${buatHtmlKartu(row, index)}</div>`;
       count++;
@@ -139,14 +185,26 @@ function buatHtmlKartu(row, id) {
 
 function terapkanGayaCSSKonstan() {
   KEYS.forEach(k => {
-    const elemenList = document.querySelectorAll(`.txt-${k}`);
-    elemenList.forEach(el => {
-      el.style.top = posisiTeks[k].top + '%';
-      el.style.left = posisiTeks[k].left + '%';
-      el.style.fontSize = posisiTeks[k].size + '%'; // Menggunakan % agar adaptif mengikuti ukuran kartu
-      el.style.width = posisiTeks[k].width + '%';
-      el.style.textAlign = posisiTeks[k].align;
-    });
+    if (k === 'nama') {
+      // Perlakuan Khusus Center Otomatis untuk Nama
+      const boxList = document.querySelectorAll(`.txt-nama`);
+      boxList.forEach(box => {
+        box.style.top = posisiTeks[k].top + '%';
+        box.style.left = posisiTeks[k].left + '%';
+        box.style.width = posisiTeks[k].width + '%';
+        box.style.fontSize = posisiTeks[k].size + '%';
+      });
+    } else {
+      // Teks Lain Menggunakan Absolute Standar
+      const elemenList = document.querySelectorAll(`.txt-${k}`);
+      elemenList.forEach(el => {
+        el.style.top = posisiTeks[k].top + '%';
+        el.style.left = posisiTeks[k].left + '%';
+        el.style.fontSize = posisiTeks[k].size + '%';
+        el.style.width = posisiTeks[k].width + '%';
+        el.style.textAlign = posisiTeks[k].align;
+      });
+    }
   });
 }
 
@@ -163,6 +221,23 @@ function csvToArray(lines, headers) {
     result.push(obj);
   }
   return result;
+}
+
+// FUNGSI UTAMA UNTUK DOWNLOAD PDF LANGSUNG TANPA CTRL+P
+function unduhPDF() {
+  const element = document.getElementById('main-display');
+  const namaKelas = document.getElementById('filter-kelas').value;
+  
+  const opsi = {
+    margin:       [3, 3, 3, 3], // margin mepet mm
+    filename:     `Kartu_Tasmik_Kelas_${namaKelas}.pdf`,
+    image:        { type: 'jpeg', quality: 0.98 },
+    html2canvas:  { scale: 2, useCORS: true, logging: false },
+    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+  
+  // Jalankan konversi ke PDF
+  html2pdf().set(opsi).from(element).save();
 }
 
 window.onload = inisialisasiAplikasi;
