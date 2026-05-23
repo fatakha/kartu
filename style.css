@@ -52,7 +52,7 @@ body {
 }
 .preview-container-box .desain-kartu-santri {
   width: 140mm;   /* Skala besar agar mudah menggeser slider */
-  height: 93.3mm; /* Menjaga rasio landscape gambar Picture1.jpg */
+  height: 93.3mm; /* Menjaga rasio landscape gambar Picture1.png */
   box-shadow: 0 10px 25px rgba(0,0,0,0.15);
 }
 
