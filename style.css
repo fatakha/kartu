@@ -1,7 +1,7 @@
 /* ==================== CONFIG CETAK STANDAR INTERNASIONAL A4 ==================== */
 @page {
-  size: A4;
-  margin: 4mm 4mm;
+  size: A4 portrait;
+  margin: 0mm; /* Dikunci nol karena kita mengatur margin langsung di kontainer halaman */
 }
 
 body {
@@ -45,10 +45,10 @@ body {
 .panel-actions button { flex: 1; padding: 12px; font-weight: bold; border-radius: 6px; cursor: pointer; border: none; }
 .btn-primary { background-color: #16a34a; color: white; }
 .btn-secondary { background-color: #3b82f6; color: white; }
-.btn-pdf { background-color: #dc2626; color: white; }
+.btn-pdf { background-color: #ea580c; color: white; }
 .active-mode { outline: 3px solid #000; font-size: 15px; }
 
-/* ==================== MODE 1: TATA LETAK EDITING (1 KARTU DI MONITOR) ==================== */
+/* ==================== MODE 1: TATA LETAK EDITING (MONITOR) ==================== */
 .preview-container-box {
   display: flex;
   justify-content: center;
@@ -61,31 +61,35 @@ body {
   font-size: 16px; 
 }
 
-/* ==================== MODE 2: FORMULASI 8 KARTU PER LEMBAR (GRID MEPET 2x4) ==================== */
+/* ==================== MODE 2: FORMULASI KUNCI CETAK (8 KARTU GRID MEPET SIMETRIS) ==================== */
 body.print-layout-active #main-display {
   display: block;
 }
 .page {
-  width: 200mm;
-  height: 287mm;
+  width: 210mm;  /* Lebar mutlak kertas A4 */
+  height: 297mm; /* Tinggi mutlak kertas A4 */
+  padding: 6mm 5mm; /* Mengatur margin dalam secara seimbang agar kanan-kiri simetris */
   display: grid;
-  grid-template-columns: 1fr 1fr;      
-  grid-template-rows: 1fr 1fr 1fr 1fr; 
-  gap: 1mm 1mm;                        /* Jarak spasi antar kartu sangat rapat */
+  grid-template-columns: 100mm 100mm; /* Dua kolom kartu berukuran pas */
+  grid-template-rows: 71mm 71mm 71mm 71mm; /* Empat baris kartu */
+  gap: 1mm 0mm; /* Jarak vertikal mepet, jarak horizontal menempel rapat */
   page-break-after: always;
+  page-break-inside: avoid;
   box-sizing: border-box;
-  margin: 0 auto 10px auto;
-  padding: 2mm;
+  margin: 0 auto;
 }
 .card-box {
-  width: 100%; height: 100%;
-  display: flex; justify-content: center; align-items: center;
-  page-break-inside: avoid;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
 }
 .print-layout-active .desain-kartu-santri {
-  width: 96mm;   
-  height: 68mm;  
-  font-size: 10.5px; 
+  width: 98mm;  /* Lebar kartu optimal */
+  height: 69mm; /* Tinggi kartu optimal agar pas masuk grid 2x4 */
+  font-size: 11px; 
 }
 
 /* ==================== VISUAL KARTU & BACKGROUND IMAGE ==================== */
@@ -98,13 +102,11 @@ body.print-layout-active #main-display {
   box-sizing: border-box;
   overflow: hidden;
   background-color: white;
-  border-radius: 2px;
   
   print-color-adjust: exact;
   -webkit-print-color-adjust: exact;
 }
 
-/* Item Teks Kiri Kanan Atas Bawah */
 .txt-item {
   position: absolute;
   font-weight: bold;
@@ -113,14 +115,14 @@ body.print-layout-active #main-display {
   white-space: nowrap; 
 }
 
-/* FITUR UTAMA: Kontainer Pembuat Teks Nama Selalu Presisi di Tengah-Tengah */
+/* Container Center Nama Otomatis */
 .container-nama-center {
   position: absolute;
   display: flex;
-  align-items: center;     /* Mengunci teks tepat di tengah secara Vertikal */
-  justify-content: center; /* Mengunci teks tepat di tengah secara Horizontal */
-  transform: translateY(-50%); /* Menyeimbangkan poros tumpuan tengah */
-  height: 12%;             /* Batas ruang tinggi nama */
+  align-items: center;     
+  justify-content: center; 
+  transform: translateY(-50%); 
+  height: 12%;             
   font-family: 'Georgia', serif; 
   font-weight: bold;
   color: #111827;
@@ -134,10 +136,17 @@ body.print-layout-active #main-display {
   font-weight: normal;
 }
 
-/* ==================== ATURAN HILANGKAN PANEL EDIT SAAT PRINT / PDF ==================== */
+/* ==================== KUNCI PRINT PRESET BROWSER ==================== */
 @media print {
-  body { background: none; }
+  body { background: none; background-color: #ffffff; }
   .no-print, #control-panel, .tabs { display: none !important; }
   .preview-container-box { display: none !important; }
-  .page { margin: 0; padding: 0; border: none; width: 100%; height: 100%; }
+  .page { 
+    margin: 0mm auto !important; 
+    padding: 6mm 5mm !important;
+    border: none; 
+    width: 210mm !important; 
+    height: 297mm !important;
+    display: grid !important;
+  }
 }
