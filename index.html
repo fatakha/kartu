@@ -2,47 +2,40 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Cetak Kartu Santri Otomatis</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistem Cetak Kartu Santri Otomatis</title>
   <link rel="stylesheet" href="style.css">
-  <!-- Pustaka tambahan untuk membaca file excel/csv jika dibutuhkan di masa depan -->
   <script src="script.js"></script>
 </head>
 <body>
 
-  <!-- ==================== UI PANEL SETTING MAPPING ==================== -->
+  <!-- ==================== UI PANEL SETTING MAPPING (TIDAK IKUT DICETAK) ==================== -->
   <div id="mapping-panel" class="no-print">
-    <h3>⚙️ Pengaturan Mapping Kolom</h3>
-    <p>Sesuaikan placeholder template (kiri) dengan nama kolom di data CSV Anda (kanan):</p>
+    <h3>⚙️ Pengaturan Mapping Kolom Kartu</h3>
+    <p>Cocokkan tanda template (kiri) dengan nama kolom yang ada di file Excel/CSV Anda (kanan):</p>
     
     <div class="mapping-grid" id="mapping-form">
-      <!-- Form dropdown akan dibuat otomatis oleh JavaScript di sini -->
+      <!-- Dropdown pilihan kolom akan muncul otomatis di sini lewat JavaScript -->
     </div>
     
-    <button onclick="terapkanMapping()" class="btn-apply">Terapkan & Generate Kartu</button>
+    <button onclick="terapkanMapping()" class="btn-apply">Terapkan & Update Tampilan Kartu</button>
   </div>
 
-  <!-- Area Hasil Cetak Mail Merge -->
+  <!-- ==================== AREA HASIL MERGE KARTU SIAP CETAK ==================== -->
   <div id="print-area"></div>
 
-  <!-- ==================== TEMPLATE DESAIN KARTU ANDA ==================== -->
+  <!-- ==================== MASTER TEMPLATE DESAIN KARTU (DISUBSTITUSI OTOMATIS) ==================== -->
   <template id="card-template">
     <div class="desain-kartu-santri">
-      <div class="card-header">
-        <span class="kelas">Kelas: {{KELAS}}</span>
-        <span class="no-urut">Urut: {{NO_URUT}}</span>
-      </div>
       
-      <div class="card-body">
-        <h3 class="nama-santri">{{NAMA}}</h3>
-        <table class="detail-table">
-          <tr><td>Pengampu</td><td>: {{PENGAMPU}}</td></tr>
-          <tr><td>Penguji</td><td>: {{PENGUJI}}</td></tr>
-        </table>
-      </div>
+      <!-- Komponen teks data melayang di atas gambar Picture1.png -->
+      <div class="txt-no-urut">No. Urut: {{NO_URUT}}</div>
+      <div class="txt-kelas">Kelas: {{KELAS}}</div>
+      <div class="txt-nama">{{NAMA}}</div>
+      <div class="txt-pengampu">Pengampu: {{PENGAMPU}}</div>
+      <div class="txt-penguji">Penguji: {{PENGUJI}}</div>
+      <div class="txt-keterangan">Ket: {{KET}}</div>
 
-      <div class="card-footer">
-        <span class="status">Ket: {{KET}}</span>
-      </div>
     </div>
   </template>
 
