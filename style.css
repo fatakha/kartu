@@ -1,7 +1,7 @@
 /* ==================== CONFIG CETAK STANDAR INTERNASIONAL A4 ==================== */
 @page {
   size: A4 portrait;
-  margin: 0mm; /* Dikunci nol karena kita mengatur margin langsung di kontainer halaman */
+  margin: 0mm; /* Dikunci nol agar margin diatur penuh lewat container .page di bawah */
 }
 
 body {
@@ -61,18 +61,18 @@ body {
   font-size: 16px; 
 }
 
-/* ==================== MODE 2: FORMULASI KUNCI CETAK (8 KARTU GRID MEPET SIMETRIS) ==================== */
+/* ==================== MODE 2: FORMULASI 8 KARTU GRID MEPET SIMETRIS ==================== */
 body.print-layout-active #main-display {
   display: block;
 }
 .page {
-  width: 210mm;  /* Lebar mutlak kertas A4 */
-  height: 297mm; /* Tinggi mutlak kertas A4 */
-  padding: 6mm 5mm; /* Mengatur margin dalam secara seimbang agar kanan-kiri simetris */
+  width: 210mm;  /* Ukuran Lebar A4 Mutlak */
+  height: 297mm; /* Ukuran Tinggi A4 Mutlak */
+  padding: 6mm 5mm; /* Margin pembagi simetris kanan kiri atas bawah */
   display: grid;
-  grid-template-columns: 100mm 100mm; /* Dua kolom kartu berukuran pas */
-  grid-template-rows: 71mm 71mm 71mm 71mm; /* Empat baris kartu */
-  gap: 1mm 0mm; /* Jarak vertikal mepet, jarak horizontal menempel rapat */
+  grid-template-columns: 100mm 100mm;      /* 2 Kolom menyamping */
+  grid-template-rows: 71mm 71mm 71mm 71mm; /* 4 Baris ke bawah */
+  gap: 1mm 0mm; /* Spasi vertikal mepet, horizontal rapat bersentuhan */
   page-break-after: always;
   page-break-inside: avoid;
   box-sizing: border-box;
@@ -87,9 +87,9 @@ body.print-layout-active #main-display {
   box-sizing: border-box;
 }
 .print-layout-active .desain-kartu-santri {
-  width: 98mm;  /* Lebar kartu optimal */
-  height: 69mm; /* Tinggi kartu optimal agar pas masuk grid 2x4 */
-  font-size: 11px; 
+  width: 98mm;  
+  height: 69mm; 
+  font-size: 11px; /* Skala otomatis mereduksi teks agar pas di kartu kecil */
 }
 
 /* ==================== VISUAL KARTU & BACKGROUND IMAGE ==================== */
@@ -103,6 +103,11 @@ body.print-layout-active #main-display {
   overflow: hidden;
   background-color: white;
   
+  /* PENGUNCI KETAJAMAN: Mencegah gambar template blur saat diekspor */
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  image-rendering: quality;
+  
   print-color-adjust: exact;
   -webkit-print-color-adjust: exact;
 }
@@ -115,7 +120,7 @@ body.print-layout-active #main-display {
   white-space: nowrap; 
 }
 
-/* Container Center Nama Otomatis */
+/* KUNCI CENTER: Wadah Flexbox penengah nama santri agar presisi di tengah */
 .container-nama-center {
   position: absolute;
   display: flex;
@@ -136,7 +141,7 @@ body.print-layout-active #main-display {
   font-weight: normal;
 }
 
-/* ==================== KUNCI PRINT PRESET BROWSER ==================== */
+/* ==================== ATURAN MEDIA PRINT NATIVE BROWSER ==================== */
 @media print {
   body { background: none; background-color: #ffffff; }
   .no-print, #control-panel, .tabs { display: none !important; }
