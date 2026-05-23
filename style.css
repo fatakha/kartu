@@ -51,8 +51,8 @@ body {
   padding: 20px;
 }
 .preview-container-box .desain-kartu-santri {
-  width: 120mm;   /* Diperbesar di layar monitor agar mudah diedit */
-  height: 113.3mm;
+  width: 140mm;   /* Skala besar agar mudah menggeser slider */
+  height: 93.3mm; /* Menjaga rasio landscape gambar Picture1.jpg */
   box-shadow: 0 10px 25px rgba(0,0,0,0.15);
 }
 
@@ -64,9 +64,9 @@ body.print-layout-active #main-display {
   width: 190mm;
   height: 273mm;
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr 1fr;
-  gap: 5mm;
+  grid-template-columns: 1fr 1fr;  /* 2 Kolom menyamping */
+  grid-template-rows: 1fr 1fr 1fr; /* 3 Baris ke bawah */
+  gap: 8mm 5mm;                    /* Jarak potong aman vertikal dan horizontal */
   page-break-after: always;
   box-sizing: border-box;
   margin: 0 auto 20px auto;
@@ -77,13 +77,13 @@ body.print-layout-active #main-display {
   page-break-inside: avoid;
 }
 .print-layout-active .desain-kartu-santri {
-  width: 90mm;  /* Otomatis mengecil ke ukuran asli pas cetak kertas */
-  height: 85mm;
+  width: 90mm;  /* Ukuran asli saat masuk kertas cetak A4 */
+  height: 60mm; /* Tinggi yang proporsional agar gambar Picture1.jpg tidak gepeng */
 }
 
 /* ==================== ENTITAS VISUAL KARTU & BACKGROUND IMAGE ==================== */
 .desain-kartu-santri {
-  background-image: url('Picture1.png');
+  background-image: url('Picture1.jpg'); /* Disesuaikan dengan nama file Picture1.jpg */
   background-size: 100% 100%;
   background-repeat: no-repeat;
   background-position: center;
@@ -91,14 +91,25 @@ body.print-layout-active #main-display {
   box-sizing: border-box;
   overflow: hidden;
   background-color: white;
+  border-radius: 4px;
 }
 
 /* Item Teks Melayang */
 .txt-item {
   position: absolute;
   font-weight: bold;
-  color: #000000;
+  color: #1a3020; /* Warna hijau tua gelap agar serasi dengan ornamen masjid */
   line-height: 1.2;
+}
+
+.txt-nama {
+  font-family: 'Georgia', serif; /* Font nama dibuat lebih anggun/formal */
+  color: #111827;
+}
+
+.txt-kelas, .txt-keterangan {
+  color: #6b7280; /* Warna abu-abu elegan untuk info pojok atas */
+  font-weight: normal;
 }
 
 /* ==================== ATURAN HILANGKAN PANEL EDIT SAAT TOMBOL PRINT DIKLIK ==================== */
