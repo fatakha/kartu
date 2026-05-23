@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sistem Cetak Kartu Santri Otomatis</title>
+  <title>Sistem Cetak Kartu Santri Otomatis - SD Alam Arrohmah</title>
   <link rel="stylesheet" href="style.css">
   <script src="script.js"></script>
 </head>
 <body>
 
-  <!-- ==================== UI PANEL SETTING & EDITOR ==================== -->
+  <!-- ==================== UI PANEL CONTROL EDITING ==================== -->
   <div id="control-panel" class="no-print">
     <h2>⚙️ Pengaturan & Editor Posisi Kartu (SD Alam Arrohmah)</h2>
     
@@ -37,7 +37,11 @@
       <div id="position-form"></div>
     </div>
     
+    <!-- Info Status Sinkronisasi Konfigurasi -->
+    <div id="sync-status" class="sync-info">⏳ Memuat konfigurasi...</div>
+    
     <div class="panel-actions">
+      <button id="btn-save-config" onclick="simpanKeJSON()" class="btn-save">💾 Simpan Konfigurasi Terbaru</button>
       <button id="btn-mode-preview" onclick="setMode('preview')" class="btn-secondary">✏️ Mode Edit (1 Kartu)</button>
       <button id="btn-mode-print" onclick="setMode('print')" class="btn-primary">🖨️ Kunci Tampilan (8 Kartu/Lembar)</button>
       <button id="btn-download-pdf" onclick="unduhPDF()" class="btn-pdf" style="display:none;">📄 Cetak / Simpan ke PDF</button>
@@ -54,7 +58,7 @@
       <div class="txt-item txt-kelas" id="preview-{{ID}}-kelas">{{KELAS}}</div>
       <div class="txt-item txt-keterangan" id="preview-{{ID}}-keterangan">Ket: {{KET}}</div>
       
-      <!-- Nama Santri Center -->
+      <!-- Container Khusus Center Nama Otomatis (Flexbox) -->
       <div class="container-nama-center txt-nama" id="preview-{{ID}}-nama-box">
         <span>{{NAMA}}</span>
       </div>
