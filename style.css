@@ -1,7 +1,7 @@
 /* ==================== CONFIG CETAK STANDAR INTERNASIONAL A4 ==================== */
 @page {
   size: A4 portrait;
-  margin: 0mm; /* Dikunci nol agar margin diatur penuh lewat container .page di bawah */
+  margin: 0mm; 
 }
 
 body {
@@ -41,10 +41,22 @@ body {
 .slider-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
 .slider-group label { font-size: 11px; display: flex; flex-direction: column; gap: 3px; }
 
-.panel-actions { display: flex; gap: 10px; }
-.panel-actions button { flex: 1; padding: 12px; font-weight: bold; border-radius: 6px; cursor: pointer; border: none; }
+/* Notifikasi Sinkronisasi */
+.sync-info {
+  font-size: 12px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  font-weight: 500;
+}
+.sync-success { background-color: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+.sync-warning { background-color: #fef9c3; color: #854d0e; border: 1px solid #fef08a; }
+
+.panel-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.panel-actions button { flex: 1; min-width: 150px; padding: 12px; font-weight: bold; border-radius: 6px; cursor: pointer; border: none; }
+.btn-save { background-color: #0284c7; color: white; }
 .btn-primary { background-color: #16a34a; color: white; }
-.btn-secondary { background-color: #3b82f6; color: white; }
+.btn-secondary { background-color: #475569; color: white; }
 .btn-pdf { background-color: #ea580c; color: white; }
 .active-mode { outline: 3px solid #000; font-size: 15px; }
 
@@ -61,18 +73,18 @@ body {
   font-size: 16px; 
 }
 
-/* ==================== MODE 2: FORMULASI 8 KARTU GRID MEPET SIMETRIS ==================== */
+/* ==================== MODE 2: FORMULASI KUNCI CETAK (8 KARTU GRID) ==================== */
 body.print-layout-active #main-display {
   display: block;
 }
 .page {
-  width: 210mm;  /* Ukuran Lebar A4 Mutlak */
-  height: 297mm; /* Ukuran Tinggi A4 Mutlak */
-  padding: 6mm 5mm; /* Margin pembagi simetris kanan kiri atas bawah */
+  width: 210mm;  
+  height: 297mm; 
+  padding: 6mm 5mm; 
   display: grid;
-  grid-template-columns: 100mm 100mm;      /* 2 Kolom menyamping */
-  grid-template-rows: 71mm 71mm 71mm 71mm; /* 4 Baris ke bawah */
-  gap: 1mm 0mm; /* Spasi vertikal mepet, horizontal rapat bersentuhan */
+  grid-template-columns: 100mm 100mm;      
+  grid-template-rows: 71mm 71mm 71mm 71mm; 
+  gap: 1mm 0mm; 
   page-break-after: always;
   page-break-inside: avoid;
   box-sizing: border-box;
@@ -89,7 +101,7 @@ body.print-layout-active #main-display {
 .print-layout-active .desain-kartu-santri {
   width: 98mm;  
   height: 69mm; 
-  font-size: 11px; /* Skala otomatis mereduksi teks agar pas di kartu kecil */
+  font-size: 11px; 
 }
 
 /* ==================== VISUAL KARTU & BACKGROUND IMAGE ==================== */
@@ -103,7 +115,6 @@ body.print-layout-active #main-display {
   overflow: hidden;
   background-color: white;
   
-  /* PENGUNCI KETAJAMAN: Mencegah gambar template blur saat diekspor */
   image-rendering: -webkit-optimize-contrast;
   image-rendering: crisp-edges;
   image-rendering: quality;
@@ -120,7 +131,7 @@ body.print-layout-active #main-display {
   white-space: nowrap; 
 }
 
-/* KUNCI CENTER: Wadah Flexbox penengah nama santri agar presisi di tengah */
+/* Container Center Nama Otomatis */
 .container-nama-center {
   position: absolute;
   display: flex;
@@ -141,7 +152,7 @@ body.print-layout-active #main-display {
   font-weight: normal;
 }
 
-/* ==================== ATURAN MEDIA PRINT NATIVE BROWSER ==================== */
+/* ==================== KUNCI PRINT PRESET BROWSER ==================== */
 @media print {
   body { background: none; background-color: #ffffff; }
   .no-print, #control-panel, .tabs { display: none !important; }
