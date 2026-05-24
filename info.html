@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Interaktif Murid & Wali Murid</title>
+  <!-- Menggunakan Tailwind CSS CDN Oficial -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Menggunakan Lucide Icons untuk estetika ikon modern -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen pb-12">
+
+  <!-- ==================== HEADER / NAVIGASI ==================== -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="bg-indigo-600 text-white p-2 rounded-xl shadow-md shadow-indigo-100">
+          <i data-lucide="graduation-cap" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold text-slate-900 tracking-tight">Portal Data Siswa</h1>
+          <p class="text-xs text-slate-500 font-medium">SD Alam Arrohmah</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 text-xs bg-slate-100 text-slate-600 px-3 py-1.5 rounded-full font-medium">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        Data Interaktif
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== MAIN CONTENT ==================== -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 space-y-6">
+    
+    <!-- STATS CARD (RANGKUMAN DATA) -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 flex items-center justify-between shadow-sm">
+        <div>
+          <p class="text-sm font-medium text-slate-500">Total Murid</p>
+          <h3 id="stat-total-murid" class="text-2xl font-bold text-slate-900 mt-1">0</h3>
+        </div>
+        <div class="bg-blue-50 text-blue-600 p-3 rounded-xl"><i data-lucide="users" class="w-6 h-6"></i></div>
+      </div>
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 flex items-center justify-between shadow-sm">
+        <div>
+          <p class="text-sm font-medium text-slate-500">Total Kelas</p>
+          <h3 id="stat-total-kelas" class="text-2xl font-bold text-slate-900 mt-1">0</h3>
+        </div>
+        <div class="bg-purple-50 text-purple-600 p-3 rounded-xl"><i data-lucide="layout-grid" class="w-6 h-6"></i></div>
+      </div>
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 flex items-center justify-between shadow-sm">
+        <div>
+          <p class="text-sm font-medium text-slate-500">Status File CSV</p>
+          <h3 id="stat-csv-status" class="text-sm font-semibold text-amber-600 mt-2 flex items-center gap-1.5">
+            <i data-lucide="alert-circle" class="w-4 h-4"></i> Membaca data...
+          </h3>
+        </div>
+        <div class="bg-amber-50 text-amber-600 p-3 rounded-xl"><i data-lucide="file-spreadsheet" class="w-6 h-6"></i></div>
+      </div>
+    </div>
+
+    <!-- FILTER & SEARCH PANEL -->
+    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-4 justify-between items-center">
+      <!-- Input Search -->
+      <div class="relative w-full md:max-w-md">
+        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+          <i data-lucide="search" class="w-5 h-5"></i>
+        </span>
+        <input type="text" id="search-input" oninput="filterData()" placeholder="Cari nama murid atau wali murid..." 
+          class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm transition-all">
+      </div>
+      
+      <!-- Dropdown Filter Kelas -->
+      <div class="flex items-center gap-3 w-full md:w-auto">
+        <label for="filter-kelas" class="text-sm font-semibold text-slate-600 whitespace-nowrap hidden sm:inline">Pilih Kelas:</label>
+        <select id="filter-kelas" onchange="filterData()" 
+          class="w-full md:w-56 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm font-medium text-slate-700 transition-all cursor-pointer">
+          <option value="SEMUA">✨ Semua Kelas</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- DATA GRID / TABLE -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      <!-- Tampilan Desktop (Tabel Modern) -->
+      <div class="overflow-x-auto hidden md:block">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-50/70 border-b border-slate-200 text-slate-500 font-semibold text-xs tracking-wider uppercase">
+              <th class="py-4 px-6 w-16 text-center">No</th>
+              <th class="py-4 px-6">Identitas Murid</th>
+              <th class="py-4 px-6">Kelas</th>
+              <th class="py-4 px-6">Wali Murid (Orang Tua)</th>
+              <th class="py-4 px-6">Kontak / Keterangan</th>
+            </tr>
+          </thead>
+          <tbody id="table-body" class="divide-y divide-slate-100 text-sm">
+            <!-- Data disuntik via Javascript -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Tampilan Mobile (Card List) -->
+      <div id="mobile-card-list" class="block md:hidden divide-y divide-slate-100">
+        <!-- Data versi mobile disuntik di sini -->
+      </div>
+
+      <!-- State Jika Data Kosong / Tidak Ditemukan -->
+      <div id="empty-state" class="hidden py-16 flex flex-col items-center justify-center text-center">
+        <div class="bg-slate-100 text-slate-400 p-4 rounded-full mb-3">
+          <i data-lucide="folder-open" class="w-8 h-8"></i>
+        </div>
+        <h4 class="text-base font-bold text-slate-700">Data Tidak Ditemukan</h4>
+        <p class="text-xs text-slate-400 mt-1 max-w-xs">Coba periksa kembali kata kunci pencarian Anda atau ganti filter kelas.</p>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ==================== ENGINE JAVASCRIPT ==================== -->
+  <script>
+    // Konfigurasi Header Kolom CSV Anda
+    // Sesuaikan string di bawah ini agar pas persis dengan judul kolom di data.csv Anda
+    const COLUMNS = {
+      no: "No",
+      namaSiswa: "Nama Santri",     // Ubah menjadi "Nama Siswa" jika di CSV Anda tertulis demikian
+      kelas: "Kelas",
+      wali: "Wali Murid",         // Sesuaikan dengan nama kolom nama orang tua/wali di CSV
+      kontak: "Kontak"            // Sesuaikan dengan nama kolom No HP/Kontak di CSV jika ada
+    };
+
+    let masterData = [];
+    let daftarKelas = new Set();
+
+    // Fungsi Pengambil Data CSV Utama
+    async function loadCSV() {
+      const statusEl = document.getElementById('stat-csv-status');
+      try {
+        const response = await fetch('data.csv');
+        if (!response.ok) throw new Error('File tidak ditemukan');
+        
+        const textData = await response.text();
+        const lines = textData.split('\n').map(l => l.trim()).filter(l => l !== "");
+        
+        if (lines.length === 0) return;
+
+        // Deteksi otomatis separator (Koma atau Titik Koma)
+        const separator = lines[0].includes(';') ? ';' : ',';
+        const headers = lines[0].split(separator).map(h => h.trim().replace(/^"|"$/g, ''));
+
+        // Parsing baris menjadi Array of Object
+        masterData = lines.slice(1).map(line => {
+          const values = line.split(separator).map(v => v.trim().replace(/^"|"$/g, ''));
+          let obj = {};
+          headers.forEach((header, index) => {
+            obj[header] = values[index] || '-';
+          });
+          return obj;
+        });
+
+        // Bersihkan data kosong
+        masterData = masterData.filter(item => item[COLUMNS.namaSiswa] && item[COLUMNS.namaSiswa] !== '-');
+
+        // Kumpulkan list kelas unik untuk filter dropdown
+        masterData.forEach(item => {
+          if (item[COLUMNS.kelas]) daftarKelas.add(item[COLUMNS.kelas]);
+        });
+
+        // Perbarui UI Komponen
+        populateFilterKelas();
+        updateDashboardStats();
+        renderData(masterData);
+
+        statusEl.className = "text-sm font-semibold text-emerald-600 mt-2 flex items-center gap-1.5";
+        statusEl.innerHTML = `<i data-lucide="check-circle" class="w-4 h-4"></i> Terhubung Terkini`;
+        lucide.createIcons();
+
+      } catch (error) {
+        statusEl.className = "text-sm font-semibold text-rose-600 mt-2 flex items-center gap-1.5";
+        statusEl.innerHTML = `<i data-lucide="x-circle" class="w-4 h-4"></i> Gagal Memuat data.csv`;
+        console.error(error);
+      }
+    }
+
+    function updateDashboardStats() {
+      document.getElementById('stat-total-murid').innerText = masterData.length;
+      document.getElementById('stat-total-kelas').innerText = daftarKelas.size;
+    }
+
+    function populateFilterKelas() {
+      const select = document.getElementById('filter-kelas');
+      Array.from(daftarKelas).sort().forEach(kelas => {
+        let opt = new Option(`Kelas ${kelas}`, kelas);
+        select.add(opt);
+      });
+    }
+
+    // Fungsi Render Tampilan Utama (Desktop & Mobile)
+    function renderData(data) {
+      const tableBody = document.getElementById('table-body');
+      const mobileList = document.getElementById('mobile-card-list');
+      const emptyState = document.getElementById('empty-state');
+
+      tableBody.innerHTML = '';
+      mobileList.innerHTML = '';
+
+      if (data.length === 0) {
+        emptyState.classList.remove('hidden');
+        return;
+      } else {
+        emptyState.classList.add('hidden');
+      }
+
+      data.forEach((row, idx) => {
+        const no = row[COLUMNS.no] || (idx + 1);
+        const nama = row[COLUMNS.namaSiswa] || '-';
+        const kelas = row[COLUMNS.kelas] || '-';
+        const wali = row[COLUMNS.wali] || '-';
+        const kontak = row[COLUMNS.kontak] || '-';
+
+        // 1. Template baris data versi Desktop
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50/80 transition-colors";
+        tr.innerHTML = `
+          <td class="py-4 px-6 text-center font-medium text-slate-400">${no}</td>
+          <td class="py-4 px-6">
+            <div class="font-semibold text-slate-900">${nama}</div>
+          </td>
+          <td class="py-4 px-6">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100">
+              ${kelas}
+            </span>
+          </td>
+          <td class="py-4 px-6 font-medium text-slate-700">${wali}</td>
+          <td class="py-4 px-6 text-slate-500 font-medium">${kontak}</td>
+        `;
+        tableBody.appendChild(tr);
+
+        // 2. Template kartu data versi Mobile (Responsive)
+        const card = document.createElement('div');
+        card.className = "p-4 space-y-3 bg-white";
+        card.innerHTML = `
+          <div class="flex justify-between items-start">
+            <div>
+              <span class="text-xs font-bold text-slate-400 mr-1">#${no}</span>
+              <span class="text-sm font-bold text-slate-900">${nama}</span>
+            </div>
+            <span class="text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-100 px-2 py-0.5 rounded-full">${kelas}</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2 pt-1 text-xs border-t border-slate-100/70">
+            <div>
+              <p class="text-slate-400 font-medium">Wali Murid</p>
+              <p class="font-semibold text-slate-700 mt-0.5">${wali}</p>
+            </div>
+            <div>
+              <p class="text-slate-400 font-medium">Kontak</p>
+              <p class="font-medium text-slate-600 mt-0.5">${kontak}</p>
+            </div>
+          </div>
+        `;
+        mobileList.appendChild(card);
+      });
+    }
+
+    // Fungsi Logika Filter dan Search Gabungan
+    function filterData() {
+      const keyword = document.getElementById('search-input').value.toLowerCase();
+      const kelasTerpilih = document.getElementById('filter-kelas').value;
+
+      const hasilFilter = masterData.filter(row => {
+        const matchKeyword = 
+          (row[COLUMNS.namaSiswa] && row[COLUMNS.namaSiswa].toLowerCase().includes(keyword)) ||
+          (row[COLUMNS.wali] && row[COLUMNS.wali].toLowerCase().includes(keyword));
+        
+        const matchKelas = (kelasTerpilih === 'SEMUA') || (row[COLUMNS.kelas] === kelasTerpilih);
+
+        return matchKeyword && matchKelas;
+      });
+
+      renderData(hasilFilter);
+    }
+
+    // Jalankan sistem saat halaman selesai dimuat
+    window.onload = () => {
+      loadCSV();
+      lucide.createIcons(); // Inisialisasi ikon grafis
+    };
+  </script>
+</body>
+</html>
