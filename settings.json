@@ -1,0 +1,55 @@
+{
+  "kunciMapping": {
+    "{{NO}}": "No",
+    "{{NO_URUT}}": "No Urut",
+    "{{KELAS}}": "Kelas",
+    "{{NAMA}}": "Nama Santri",
+    "{{PENGAMPU}}": "Pengampu",
+    "{{PENGUJI}}": "Penguji",
+    "{{KET}}": "Keterangan"
+  },
+  "posisiTeks": {
+    "kelas": {
+      "top": 67,
+      "left": 48,
+      "size": 100,
+      "width": 25,
+      "align": "left"
+    },
+    "keterangan": {
+      "top": 5,
+      "left": 72,
+      "size": 100,
+      "width": 25,
+      "align": "right"
+    },
+    "nama": {
+      "top": 63,
+      "left": 5,
+      "size": 155,
+      "width": 90,
+      "align": "center"
+    },
+    "no-urut": {
+      "top": 82,
+      "left": 23,
+      "size": 100,
+      "width": 10,
+      "align": "left"
+    },
+    "penguji": {
+      "top": 82,
+      "left": 47,
+      "size": 100,
+      "width": 20,
+      "align": "left"
+    },
+    "pengampu": {
+      "top": 82,
+      "left": 75,
+      "size": 100,
+      "width": 20,
+      "align": "left"
+    }
+  }
+}
